@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">JuWeather</string>
+
+    <string name="actionbar_search">ActionBar Search</string>
+    <string name="actionbar_settings">ActionBar Settings</string>
+    <string name="search_city">Search City...</string>
+
+    <string name="update_time">Update At</string>
+    <string name="city">Your City, Country</string>
+</resources>
