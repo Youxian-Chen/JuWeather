@@ -2,12 +2,15 @@ package com.example.youxian.juweather;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.LocationManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -27,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private WeatherFragment mWeatherFragment;
     private SearchView mSearchView;
 
-    private IntentFilter mIntentFilter;
+    private IntentFilter mWeatherIntentFilter;
+    private IntentFilter mLocationIntentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,23 +40,34 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(LOCAL_CURRENT_WEATHER);
+        mWeatherIntentFilter = new IntentFilter();
+        mWeatherIntentFilter.addAction(LOCAL_CURRENT_WEATHER);
 
-        startWeatherService();
+        mLocationIntentFilter = new IntentFilter();
+        mLocationIntentFilter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
+
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+        } else {
+            startWeatherService();
+        }
+
         initView();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mWeatherReceiver, mIntentFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mWeatherReceiver, mWeatherIntentFilter);
+        registerReceiver(mLocationReceiver, mLocationIntentFilter);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mWeatherReceiver);
+        unregisterReceiver(mLocationReceiver);
     }
 
     @Override
@@ -100,6 +115,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog,
+                                        @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     private void startWeatherService() {
         Intent getWeatherIntent = new Intent(MainActivity.this, GetWeatherService.class);
         getWeatherIntent.setAction(GetWeatherService.GET_LOCAL_CURRENT_WEATHER);
@@ -137,10 +171,26 @@ public class MainActivity extends AppCompatActivity {
                 if (mWeatherFragment != null) {
                     CurrentWeather currentWeather = (CurrentWeather) intent
                             .getSerializableExtra(LOCAL_CURRENT_WEATHER);
-                    Log.d(TAG, currentWeather.getName());
-                    Log.d(TAG, currentWeather.getWeather(0).getMain());
+                    //Log.d(TAG, currentWeather.getName());
+                    //Log.d(TAG, currentWeather.getWeather(0).getMain());
                     if (currentWeather != null)
                         mWeatherFragment.setCurrentWeather(currentWeather);
+                    else Log.d(TAG, "current weather null");
+                }
+            }
+        }
+    };
+
+    private BroadcastReceiver mLocationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d(TAG, action);
+            if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(action)) {
+                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    Log.d(TAG, "GPS enabled");
+                    startWeatherService();
                 }
             }
         }

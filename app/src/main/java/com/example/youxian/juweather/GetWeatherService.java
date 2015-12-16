@@ -54,7 +54,6 @@ public class GetWeatherService extends IntentService implements Callback<Current
         Log.d(TAG, action);
         if (GET_LOCAL_CURRENT_WEATHER.equals(action)) {
             getLocation();
-            getCurrentWeather();
         }
 
     }
@@ -89,6 +88,7 @@ public class GetWeatherService extends IntentService implements Callback<Current
     }
 
     private void getLocation() {
+        Log.d(TAG, "getLocation");
         Location location = getLastKnownLocation();
         if (location != null) {
             Log.d(TAG, "location not null");
@@ -105,6 +105,15 @@ public class GetWeatherService extends IntentService implements Callback<Current
                 separatedString = addresses.get(0).getAdminArea().split(" ");
                 mCityName = separatedString[0];
                 Log.d(TAG, mCityName);
+                getCurrentWeather();
+            }
+        } else {
+            Log.d(TAG, "location null");
+            try {
+                Thread.sleep(3000);
+                getLocation();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
