@@ -1,7 +1,12 @@
 package com.example.youxian.juweather;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,13 +16,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.youxian.juweather.weather.CurrentWeather;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.toString();
     private static final String TAG_FRAGMENT = "tag_fragment";
 
+    public static final String LOCAL_CURRENT_WEATHER = "local_current_weather";
 
     private WeatherFragment mWeatherFragment;
     private SearchView mSearchView;
+
+    private IntentFilter mIntentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +35,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(LOCAL_CURRENT_WEATHER);
+
+        startWeatherService();
         initView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mWeatherReceiver, mIntentFilter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mWeatherReceiver);
     }
 
     @Override
@@ -73,6 +100,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void startWeatherService() {
+        Intent getWeatherIntent = new Intent(MainActivity.this, GetWeatherService.class);
+        getWeatherIntent.setAction(GetWeatherService.GET_LOCAL_CURRENT_WEATHER);
+        startService(getWeatherIntent);
+    }
+
     private void initView() {
         replaceFragment(getWeatherFragment(), false);
     }
@@ -94,4 +127,22 @@ public class MainActivity extends AppCompatActivity {
         }
         return mWeatherFragment;
     }
+
+    private BroadcastReceiver mWeatherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d(TAG, action);
+            if (LOCAL_CURRENT_WEATHER.equals(action)) {
+                if (mWeatherFragment != null) {
+                    CurrentWeather currentWeather = (CurrentWeather) intent
+                            .getSerializableExtra(LOCAL_CURRENT_WEATHER);
+                    Log.d(TAG, currentWeather.getName());
+                    Log.d(TAG, currentWeather.getWeather(0).getMain());
+                    if (currentWeather != null)
+                        mWeatherFragment.setCurrentWeather(currentWeather);
+                }
+            }
+        }
+    };
 }
