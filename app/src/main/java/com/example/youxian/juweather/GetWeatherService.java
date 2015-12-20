@@ -10,6 +10,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.example.youxian.juweather.weather.CurrentWeather;
+import com.example.youxian.juweather.weather.ForecastWeather;
 import com.example.youxian.juweather.weather.WeatherService;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ import retrofit.Retrofit;
 /**
  * Created by Youxian on 12/15/15.
  */
-public class GetWeatherService extends IntentService implements Callback<CurrentWeather> {
+public class GetWeatherService extends IntentService {
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      *
@@ -38,8 +39,18 @@ public class GetWeatherService extends IntentService implements Callback<Current
 
     private String mCityName;
 
-    private Call<CurrentWeather> mCall;
+    private Call<CurrentWeather> mCurrentCall;
+    private Call<ForecastWeather> mForecastCall;
+
     private CurrentWeather mCurrentWeather;
+    private ForecastWeather mForecastWeather;
+
+    private Callback<CurrentWeather> mCurrentCallback;
+    private Callback<ForecastWeather> mForecastCallback;
+
+    private boolean isCurrentResponsed = false;
+    private boolean isForecastResponsed = false;
+
     public GetWeatherService(String name) {
         super(name);
     }
@@ -58,33 +69,82 @@ public class GetWeatherService extends IntentService implements Callback<Current
 
     }
 
-    @Override
-    public void onResponse(Response<CurrentWeather> response, Retrofit retrofit) {
-        Log.d(TAG, "onResponse");
-        if (response != null) {
-            mCurrentWeather = response.body();
-            Intent weatherDataIntent = new Intent();
-            weatherDataIntent.setAction(MainActivity.LOCAL_CURRENT_WEATHER);
-            weatherDataIntent.putExtra(MainActivity.LOCAL_CURRENT_WEATHER, mCurrentWeather);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(weatherDataIntent);
-            stopSelf();
-        }
-    }
-
-    @Override
-    public void onFailure(Throwable t) {
-        Log.d(TAG, "onFailure");
-        Log.d(TAG, t.toString());
-    }
-
     private void getCurrentWeather() {
+        mCurrentCallback = new Callback<CurrentWeather>() {
+            @Override
+            public void onResponse(Response<CurrentWeather> response, Retrofit retrofit) {
+                Log.d(TAG, "Current onResponse");
+                if (response != null) {
+                    mCurrentWeather = response.body();
+                    Intent weatherDataIntent = new Intent();
+                    weatherDataIntent.setAction(MainActivity.LOCAL_CURRENT_WEATHER);
+                    weatherDataIntent.putExtra(MainActivity.LOCAL_CURRENT_WEATHER, mCurrentWeather);
+                    LocalBroadcastManager.getInstance(GetWeatherService.this).sendBroadcast(weatherDataIntent);
+                    isCurrentResponsed = true;
+                    if (isCurrentResponsed && isForecastResponsed) {
+                        Log.d(TAG, "stop intent service");
+                        stopSelf();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, "Current onFailure");
+                Log.d(TAG, t.toString());
+                isCurrentResponsed = true;
+                if (isCurrentResponsed && isForecastResponsed) {
+                    Log.d(TAG, "stop intent service");
+                    stopSelf();
+                }
+            }
+        };
         Retrofit mRetrofit = new Retrofit.Builder()
                 .baseUrl(WEB_SERVICE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         WeatherService weatherService = mRetrofit.create(WeatherService.class);
-        mCall = weatherService.fetchCurrentWeather(mCityName);
-        mCall.enqueue(GetWeatherService.this);
+        mCurrentCall = weatherService.fetchCurrentWeather(mCityName);
+        mCurrentCall.enqueue(mCurrentCallback);
+    }
+
+    private void getForecastWeather() {
+        mForecastCallback = new Callback<ForecastWeather>() {
+            @Override
+            public void onResponse(Response<ForecastWeather> response, Retrofit retrofit) {
+                Log.d(TAG, "Forecast onResponse");
+                if (response != null) {
+                    mForecastWeather = response.body();
+                    Intent weatherDataIntent = new Intent();
+                    weatherDataIntent.setAction(MainActivity.LOCAL_FORECAST_WEATHER);
+                    weatherDataIntent.putExtra(MainActivity.LOCAL_FORECAST_WEATHER, mForecastWeather);
+                    LocalBroadcastManager.getInstance(GetWeatherService.this).sendBroadcast(weatherDataIntent);
+                    isForecastResponsed = true;
+                    if (isCurrentResponsed && isForecastResponsed) {
+                        Log.d(TAG, "stop intent service");
+                        stopSelf();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, "Forecast onFailure");
+                Log.d(TAG, t.toString());
+                isForecastResponsed = true;
+                if (isCurrentResponsed && isForecastResponsed) {
+                    Log.d(TAG, "stop intent service");
+                    stopSelf();
+                }
+            }
+        };
+        Retrofit mRetrofit = new Retrofit.Builder()
+                .baseUrl(WEB_SERVICE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        WeatherService weatherService = mRetrofit.create(WeatherService.class);
+        mForecastCall = weatherService.fetchForecastWeather(mCityName);
+        mForecastCall.enqueue(mForecastCallback);
     }
 
     private void getLocation() {
@@ -106,6 +166,7 @@ public class GetWeatherService extends IntentService implements Callback<Current
                 mCityName = separatedString[0];
                 Log.d(TAG, mCityName);
                 getCurrentWeather();
+                getForecastWeather();
             }
         } else {
             Log.d(TAG, "location null");

@@ -49,5 +49,13 @@
         android:layout_below="@+id/pressure_text_weather"
         android:text="0 ℃" />
 
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_weather"
+        android:layout_below="@+id/temperature_text_weather"
+        android:layout_marginTop="10dp">
+    </ListView>
+
 
 </RelativeLayout>

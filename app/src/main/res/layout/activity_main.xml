@@ -16,6 +16,5 @@
         android:layout_height="match_parent"
         android:id="@+id/container_weather"
         android:layout_below="@+id/my_toolbar">
-
     </RelativeLayout>
 </RelativeLayout>

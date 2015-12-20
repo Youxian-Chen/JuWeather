@@ -20,12 +20,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.youxian.juweather.weather.CurrentWeather;
+import com.example.youxian.juweather.weather.ForecastWeather;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.toString();
     private static final String TAG_FRAGMENT = "tag_fragment";
 
     public static final String LOCAL_CURRENT_WEATHER = "local_current_weather";
+    public static final String LOCAL_FORECAST_WEATHER = "local_forecast_weather";
 
     private WeatherFragment mWeatherFragment;
     private SearchView mSearchView;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         mWeatherIntentFilter = new IntentFilter();
         mWeatherIntentFilter.addAction(LOCAL_CURRENT_WEATHER);
+        mWeatherIntentFilter.addAction(LOCAL_FORECAST_WEATHER);
 
         mLocationIntentFilter = new IntentFilter();
         mLocationIntentFilter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
@@ -176,6 +179,20 @@ public class MainActivity extends AppCompatActivity {
                     if (currentWeather != null)
                         mWeatherFragment.setCurrentWeather(currentWeather);
                     else Log.d(TAG, "current weather null");
+                }
+            } else if (LOCAL_FORECAST_WEATHER.equals(action)) {
+                if (mWeatherFragment != null) {
+                    ForecastWeather forecastWeather = (ForecastWeather) intent
+                            .getSerializableExtra(LOCAL_FORECAST_WEATHER);
+                    Log.d(TAG, forecastWeather.getCnt());
+                    Log.d(TAG, forecastWeather.getCity().getName());
+                    Log.d(TAG, forecastWeather.getCity().getCountry());
+                    Log.d(TAG, forecastWeather.getList().length +"");
+                    if (forecastWeather != null) {
+                        mWeatherFragment.setForecastWeather(forecastWeather);
+                    } else {
+                        Log.d(TAG, "forecast weather null");
+                    }
                 }
             }
         }
