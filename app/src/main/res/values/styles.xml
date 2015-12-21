@@ -40,7 +40,7 @@
     </style>
 
     <style name="TextStyle.maxTemp_item" >
-        <item name="android:textSize">10dp</item>
+        <item name="android:textSize">15dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:layout_toLeftOf">@id/min_temp_list_item</item>
@@ -48,12 +48,18 @@
     </style>
 
     <style name="TextStyle.minTemp_item" >
-        <item name="android:textSize">10dp</item>
+        <item name="android:textSize">15dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_alignParentRight">true</item>
-        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginRight">5dp</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:textColor">#77000000</item>
+    </style>
+
+    <style name="TextStyle.small_bold" >
+        <item name="android:textSize">15dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">5dp</item>
     </style>
 
 </resources>
