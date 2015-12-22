@@ -132,7 +132,7 @@ public class WeatherFragment extends Fragment {
 
         temp = Double.parseDouble(mCurrentWeather.getMain().getTemp_min()) - 273.15;
         mTemperatureMinText.setText(tempFormat.format(temp) + " ℃");
-
+        scrollViewToTop();
     }
 
     public void setForecastWeather(ForecastWeather forecastWeather) {
@@ -149,17 +149,18 @@ public class WeatherFragment extends Fragment {
     }
 
     private void updateForecastList() {
-        //mForecastList = new ArrayList<>();
-        //Collections.addAll(mForecastList, mForecastWeather.getList());
         mAdapter = new ForecastWeatherAdapter();
         mListView.setAdapter(mAdapter);
+        scrollViewToTop();
+    }
 
-        mScrollView.post(new Runnable() {
+    private void scrollViewToTop() {
+        mScrollView.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mScrollView.fullScroll(ScrollView.FOCUS_UP);
             }
-        });
+        }, 20);
     }
 
     private String getWeekdayFromString(String date) {

@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 Log.d(TAG, "query submit");
                 mSearchView.clearFocus();
-                //searchWeather(query);
+                searchWeather(query);
                 return false;
             }
 
@@ -118,6 +118,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void searchWeather(String city) {
+        Intent getSearchWeatherIntent = new Intent(MainActivity.this, GetWeatherService.class);
+        getSearchWeatherIntent.setAction(GetWeatherService.GET_SEARCH_WEATHER);
+        getSearchWeatherIntent.putExtra(GetWeatherService.GET_SEARCH_WEATHER, city);
+        startService(getSearchWeatherIntent);
+    }
+
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
@@ -139,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startWeatherService() {
         Intent getWeatherIntent = new Intent(MainActivity.this, GetWeatherService.class);
-        getWeatherIntent.setAction(GetWeatherService.GET_LOCAL_CURRENT_WEATHER);
+        getWeatherIntent.setAction(GetWeatherService.GET_LOCAL_WEATHER);
         startService(getWeatherIntent);
     }
 
@@ -184,10 +191,6 @@ public class MainActivity extends AppCompatActivity {
                 if (mWeatherFragment != null) {
                     ForecastWeather forecastWeather = (ForecastWeather) intent
                             .getSerializableExtra(LOCAL_FORECAST_WEATHER);
-                    Log.d(TAG, forecastWeather.getCnt());
-                    Log.d(TAG, forecastWeather.getCity().getName());
-                    Log.d(TAG, forecastWeather.getCity().getCountry());
-                    Log.d(TAG, forecastWeather.getList().length +"");
                     if (forecastWeather != null) {
                         mWeatherFragment.setForecastWeather(forecastWeather);
                     } else {
