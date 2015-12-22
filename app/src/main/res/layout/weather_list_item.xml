@@ -2,15 +2,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content">
 
+    <TextView
+        style="@style/TextStyle.small_bold"
+        android:text="week day"
+        android:id="@+id/weekday_list_item"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="15dp"
+        android:layout_centerVertical="true"
+        android:layout_below="@+id/temperature_text_weather"/>
+
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/icon_list_item"
+        android:layout_toLeftOf="@+id/description_list_item"
         android:src="@drawable/rain"/>
     <TextView
         style="@style/TextStyle.description_item"
         android:id="@+id/description_list_item"
-        android:layout_toRightOf="@id/icon_list_item"
+        android:layout_centerInParent="true"
         android:text="rain"/>
     <TextView
         style="@style/TextStyle.maxTemp_item"

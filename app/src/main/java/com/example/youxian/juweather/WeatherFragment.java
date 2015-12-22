@@ -18,10 +18,12 @@ import com.example.youxian.juweather.weather.CurrentWeather;
 import com.example.youxian.juweather.weather.ForecastWeather;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -135,21 +137,42 @@ public class WeatherFragment extends Fragment {
 
     public void setForecastWeather(ForecastWeather forecastWeather) {
         mForecastWeather = forecastWeather;
+        mForecastList = new ArrayList<>();
+        ForecastWeather.List[] lists = mForecastWeather.getList();
+        for (ForecastWeather.List list: lists) {
+            if (list.getDt_txt().contains("09:00:00")) {
+                Log.d(TAG, "get date");
+                mForecastList.add(list);
+            }
+        }
         updateForecastList();
     }
 
     private void updateForecastList() {
-        mForecastList = new ArrayList<>();
-        Collections.addAll(mForecastList, mForecastWeather.getList());
+        //mForecastList = new ArrayList<>();
+        //Collections.addAll(mForecastList, mForecastWeather.getList());
         mAdapter = new ForecastWeatherAdapter();
         mListView.setAdapter(mAdapter);
-        
-        mScrollView.postDelayed(new Runnable() {
+
+        mScrollView.post(new Runnable() {
             @Override
             public void run() {
                 mScrollView.fullScroll(ScrollView.FOCUS_UP);
             }
-        }, 20);
+        });
+    }
+
+    private String getWeekdayFromString(String date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date mDate = null;
+        try {
+            mDate = dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar c = Calendar.getInstance();
+        c.setTime(mDate);
+        return c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
     }
 
     private class ForecastWeatherAdapter extends BaseAdapter {
@@ -175,7 +198,8 @@ public class WeatherFragment extends Fragment {
             if (convertView == null) {
                 convertView = View.inflate(parent.getContext(), R.layout.weather_list_item, null);
                 ViewHolder tag = new ViewHolder();
-                //tag.icon = (ImageView) convertView.findViewById(R.id.icon_list_item);
+                tag.weekday = (TextView) convertView.findViewById(R.id.weekday_list_item);
+                tag.icon = (ImageView) convertView.findViewById(R.id.icon_list_item);
                 tag.description = (TextView) convertView.findViewById(R.id.description_list_item);
                 tag.maxTemp = (TextView) convertView.findViewById(R.id.max_temp_list_item);
                 tag.minTemp = (TextView) convertView.findViewById(R.id.min_temp_list_item);
@@ -186,6 +210,8 @@ public class WeatherFragment extends Fragment {
             ForecastWeather.Weather[] weathers = forecastList.getWeather();
 
             if (forecastList != null) {
+                tag.weekday.setText(getWeekdayFromString(forecastList.getDt_txt()));
+                setWeatherIcon(tag.icon, weathers[0].getDescription());
                 tag.description.setText(weathers[0].getDescription());
                 double temp = Double.parseDouble(forecastList.getMain().getTemp_max()) - 273.15;
                 DecimalFormat tempFormat = new DecimalFormat("#.0");
@@ -193,15 +219,16 @@ public class WeatherFragment extends Fragment {
                 temp = Double.parseDouble(forecastList.getMain().getTemp_min()) - 273.15;
                 tag.minTemp.setText(tempFormat.format(temp) + " ℃");
             }
-            ImageView icon = (ImageView) convertView.findViewById(R.id.icon_list_item);
-            setWeatherIcon(icon, weathers[0].getDescription());
-            Log.d(TAG, weathers[0].getDescription());
+            //ImageView icon = (ImageView) convertView.findViewById(R.id.icon_list_item);
+
+            //Log.d(TAG, weathers[0].getDescription());
             return convertView;
         }
     }
 
     private static class ViewHolder {
-        //ImageView icon;
+        TextView weekday;
+        ImageView icon;
         TextView description;
         TextView maxTemp;
         TextView minTemp;
