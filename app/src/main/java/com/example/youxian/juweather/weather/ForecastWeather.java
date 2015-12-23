@@ -1,14 +1,20 @@
 package com.example.youxian.juweather.weather;
 
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 /**
  * Created by Youxian on 12/20/15.
  */
 public class ForecastWeather implements Serializable {
+
     private City city;
-    private String cnt;
+
+    @SerializedName("cnt")
+    private String number;
+
     private List[] list;
 
 
@@ -16,8 +22,8 @@ public class ForecastWeather implements Serializable {
         return city;
     }
 
-    public String getCnt() {
-        return cnt;
+    public String getNumber() {
+        return number;
     }
 
     public List[] getList() {
@@ -28,8 +34,8 @@ public class ForecastWeather implements Serializable {
         this.city = city;
     }
 
-    public void setCnt(String cnt) {
-        this.cnt = cnt;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public void setList(List[] list) {
@@ -67,24 +73,27 @@ public class ForecastWeather implements Serializable {
     }
 
     public class List {
-        private Main main;
+
+        @SerializedName("dt")
+        private String timeStamp;
+
+        private Temp temp;
         private Weather[] weather;
-        private String dt_txt;
 
-        public String getDt_txt() {
-            return dt_txt;
+        public String getTimeStamp() {
+            return timeStamp;
         }
 
-        public void setDt_txt(String dt_txt) {
-            this.dt_txt = dt_txt;
+        public Temp getTemp() {
+            return temp;
         }
 
-        public Main getMain() {
-            return main;
+        public void setTemp(Temp temp) {
+            this.temp = temp;
         }
 
-        public void setMain(Main main) {
-            this.main = main;
+        public void setTimeStamp(String timeStamp) {
+            this.timeStamp = timeStamp;
         }
 
         public void setWeather(Weather[] weather) {
@@ -96,24 +105,24 @@ public class ForecastWeather implements Serializable {
         }
     }
 
-    public class Main {
-        private String temp_max;
-        private String temp_min;
+    public class Temp {
+        private String min;
+        private String max;
 
-        public String getTemp_max() {
-            return temp_max;
+        public String getMax() {
+            return max;
         }
 
-        public String getTemp_min() {
-            return temp_min;
+        public String getMin() {
+            return min;
         }
 
-        public void setTemp_max(String temp_max) {
-            this.temp_max = temp_max;
+        public void setMax(String max) {
+            this.max = max;
         }
 
-        public void setTemp_min(String temp_min) {
-            this.temp_min = temp_min;
+        public void setMin(String min) {
+            this.min = min;
         }
     }
 

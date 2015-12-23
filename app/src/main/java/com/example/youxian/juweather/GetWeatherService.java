@@ -127,7 +127,7 @@ public class GetWeatherService extends IntentService {
                 Log.d(TAG, "Forecast onResponse");
                 if (response.body() != null) {
                     mForecastWeather = response.body();
-                    if (mForecastWeather.getCnt() != null) {
+                    if (mForecastWeather.getNumber() != null) {
                         Intent weatherDataIntent = new Intent();
                         weatherDataIntent.setAction(MainActivity.LOCAL_FORECAST_WEATHER);
                         weatherDataIntent.putExtra(MainActivity.LOCAL_FORECAST_WEATHER, mForecastWeather);

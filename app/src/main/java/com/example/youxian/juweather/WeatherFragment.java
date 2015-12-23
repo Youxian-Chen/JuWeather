@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Youxian on 12/15/15.
@@ -138,6 +139,7 @@ public class WeatherFragment extends Fragment {
     public void setForecastWeather(ForecastWeather forecastWeather) {
         mForecastWeather = forecastWeather;
         mForecastList = new ArrayList<>();
+        /*
         ForecastWeather.List[] lists = mForecastWeather.getList();
         for (ForecastWeather.List list: lists) {
             if (list.getDt_txt().contains("09:00:00")) {
@@ -145,6 +147,11 @@ public class WeatherFragment extends Fragment {
                 mForecastList.add(list);
             }
         }
+        */
+        Collections.addAll(mForecastList, forecastWeather.getList());
+        mForecastList.remove(0);
+        mForecastList.remove(0);
+        //mForecastList.remove(2);
         updateForecastList();
     }
 
@@ -164,6 +171,7 @@ public class WeatherFragment extends Fragment {
     }
 
     private String getWeekdayFromString(String date) {
+        /*
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date mDate = null;
         try {
@@ -174,6 +182,12 @@ public class WeatherFragment extends Fragment {
         Calendar c = Calendar.getInstance();
         c.setTime(mDate);
         return c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
+        */
+        //Log.d(TAG, date);
+        long time = Long.parseLong(date) * 1000;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        return calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
     }
 
     private class ForecastWeatherAdapter extends BaseAdapter {
@@ -211,13 +225,13 @@ public class WeatherFragment extends Fragment {
             ForecastWeather.Weather[] weathers = forecastList.getWeather();
 
             if (forecastList != null) {
-                tag.weekday.setText(getWeekdayFromString(forecastList.getDt_txt()));
+                tag.weekday.setText(getWeekdayFromString(forecastList.getTimeStamp()));
                 setWeatherIcon(tag.icon, weathers[0].getDescription());
                 tag.description.setText(weathers[0].getDescription());
-                double temp = Double.parseDouble(forecastList.getMain().getTemp_max()) - 273.15;
+                double temp = Double.parseDouble(forecastList.getTemp().getMax()) - 273.15;
                 DecimalFormat tempFormat = new DecimalFormat("#.0");
                 tag.maxTemp.setText(tempFormat.format(temp) + " ℃");
-                temp = Double.parseDouble(forecastList.getMain().getTemp_min()) - 273.15;
+                temp = Double.parseDouble(forecastList.getTemp().getMin()) - 273.15;
                 tag.minTemp.setText(tempFormat.format(temp) + " ℃");
             }
             //ImageView icon = (ImageView) convertView.findViewById(R.id.icon_list_item);
