@@ -68,19 +68,19 @@
 
             <TextView
                 style="@style/TextStyle.small_bold"
-                android:text="max temp"
+                android:text="@string/max_temp"
                 android:id="@+id/maxTemp_text_weather"
-                android:layout_toLeftOf="@+id/minTemp_text_weather"
-                android:layout_marginRight="10dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="60dp"
                 android:layout_below="@+id/temperature_text_weather"/>
 
             <TextView
                 style="@style/TextStyle.small_bold"
-                android:text="min temp"
+                android:text="@string/min_temp"
                 android:id="@+id/minTemp_text_weather"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="5dp"
-                android:textColor="#77000000"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="5dp"
+                android:textColor="#CC000000"
                 android:layout_below="@+id/temperature_text_weather"/>
 
             <ListView

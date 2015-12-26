@@ -6,16 +6,15 @@
         style="@style/TextStyle.small_bold"
         android:text="week day"
         android:id="@+id/weekday_list_item"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="15dp"
-        android:layout_centerVertical="true"
-        android:layout_below="@+id/temperature_text_weather"/>
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="15dp"
+        android:layout_centerVertical="true"/>
 
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/icon_list_item"
-        android:layout_toLeftOf="@+id/description_list_item"
+        android:layout_marginStart="90dp"
         android:src="@drawable/rain"/>
     <TextView
         style="@style/TextStyle.description_item"
@@ -25,7 +24,6 @@
     <TextView
         style="@style/TextStyle.maxTemp_item"
         android:id="@+id/max_temp_list_item"
-        android:layout_marginRight="10dp"
         android:text="28" />
     <TextView
         style="@style/TextStyle.minTemp_item"

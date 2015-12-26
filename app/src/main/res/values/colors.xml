@@ -4,6 +4,9 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
     <color name="lightGreen">#00c4a2</color>
 
     <color name="cyanA2">#18FFFF</color>
@@ -14,4 +17,5 @@
     <color name="redA2">#FF5252</color>
 
     <color name="blue50">#2196F3</color>
+    <color name="blueA7">#2979FF</color>
 </resources>

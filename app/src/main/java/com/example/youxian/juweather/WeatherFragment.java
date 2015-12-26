@@ -98,8 +98,7 @@ public class WeatherFragment extends Fragment {
 
         //forecast
         mListView = (ListView) view.findViewById(R.id.list_weather);
-
-
+        mListView.setDivider(null);
 
     }
 
@@ -141,7 +140,7 @@ public class WeatherFragment extends Fragment {
         String dateFormat = "dd/MM/yyyy hh:mm:ss";
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
         Calendar calendar = Calendar.getInstance();
-        mUpdateText.setText(formatter.format(calendar.getTime()));
+        mUpdateText.setText("Update At: " + formatter.format(calendar.getTime()));
         //update image
         setWeatherIcon(mWeatherIcon, mCurrentWeather.getWeather(0).getDescription());
 
