@@ -5,4 +5,13 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="lightGreen">#00c4a2</color>
+
+    <color name="cyanA2">#18FFFF</color>
+    <color name="cyan50">#00BCD4</color>
+
+    <color name="orange50">#FF9800</color>
+
+    <color name="redA2">#FF5252</color>
+
+    <color name="blue50">#2196F3</color>
 </resources>

@@ -176,13 +176,15 @@ public class GetWeatherService extends IntentService {
                 e.printStackTrace();
             }
             String separatedString[];
-            if (addresses.size() > 0){
-                Log.d(TAG, addresses.get(0).getAdminArea());
-                separatedString = addresses.get(0).getAdminArea().split(" ");
-                mCityName = separatedString[0];
-                Log.d(TAG, mCityName);
-                getCurrentWeather(mCityName);
-                getForecastWeather(mCityName);
+            if (addresses != null) {
+                if (addresses.size() > 0){
+                    Log.d(TAG, addresses.get(0).getAdminArea());
+                    separatedString = addresses.get(0).getAdminArea().split(" ");
+                    mCityName = separatedString[0];
+                    Log.d(TAG, mCityName);
+                    getCurrentWeather(mCityName);
+                    getForecastWeather(mCityName);
+                }
             }
         } else {
             Log.d(TAG, "location null");

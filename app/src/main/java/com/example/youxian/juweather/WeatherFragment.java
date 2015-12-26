@@ -4,6 +4,7 @@ package com.example.youxian.juweather;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ public class WeatherFragment extends Fragment {
     private static final String TAG = WeatherFragment.class.toString();
 
     private ScrollView mScrollView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     //current weather
     private TextView mUpdateText;
@@ -54,7 +56,9 @@ public class WeatherFragment extends Fragment {
     private ForecastWeatherAdapter mAdapter;
 
     private CurrentWeather mCurrentWeather;
-    private ForecastWeather mForecastWeather;
+
+    private boolean isCurrentWeatherUpdated = false;
+    private boolean isForecastWeatherUpdated = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,15 @@ public class WeatherFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mScrollView = (ScrollView) view.findViewById(R.id.scrollview_weather);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_weather);
+        mSwipeRefreshLayout.setColorSchemeColors(R.color.blue50, R.color.orange50, R.color.redA2);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshWeatherData();
+            }
+        });
+        mSwipeRefreshLayout.setEnabled(false);
 
         //current
         mUpdateText = (TextView) view.findViewById(R.id.update_text_weather);
@@ -87,6 +100,23 @@ public class WeatherFragment extends Fragment {
         //forecast
         mListView = (ListView) view.findViewById(R.id.list_weather);
 
+
+
+    }
+
+    private void refreshWeatherData() {
+        if (!isCurrentWeatherUpdated && !isForecastWeatherUpdated) {
+            Log.d(TAG, "go refresh");
+            ((MainActivity) getActivity()).startWeatherService();
+        } else if (isCurrentWeatherUpdated && isForecastWeatherUpdated) {
+            Log.d(TAG, "stop refresh");
+            mSwipeRefreshLayout.setRefreshing(false);
+            isCurrentWeatherUpdated = false;
+            isForecastWeatherUpdated = false;
+            ((MainActivity) getActivity()).showUpdateInfo();
+        } else {
+            Log.d(TAG, "Do nothing");
+        }
     }
 
     private void setWeatherIcon(ImageView icon, String description) {
@@ -134,10 +164,12 @@ public class WeatherFragment extends Fragment {
         temp = Double.parseDouble(mCurrentWeather.getMain().getTemp_min()) - 273.15;
         mTemperatureMinText.setText(tempFormat.format(temp) + " ℃");
         scrollViewToTop();
+        isCurrentWeatherUpdated = true;
+        refreshWeatherData();
     }
 
     public void setForecastWeather(ForecastWeather forecastWeather) {
-        mForecastWeather = forecastWeather;
+        //mForecastWeather = forecastWeather;
         mForecastList = new ArrayList<>();
         /*
         ForecastWeather.List[] lists = mForecastWeather.getList();
@@ -150,15 +182,18 @@ public class WeatherFragment extends Fragment {
         */
         Collections.addAll(mForecastList, forecastWeather.getList());
         mForecastList.remove(0);
-        mForecastList.remove(0);
+        //mForecastList.remove(0);
         //mForecastList.remove(2);
         updateForecastList();
+        refreshWeatherData();
     }
 
     private void updateForecastList() {
         mAdapter = new ForecastWeatherAdapter();
         mListView.setAdapter(mAdapter);
         scrollViewToTop();
+        isForecastWeatherUpdated = true;
+        mSwipeRefreshLayout.setEnabled(true);
     }
 
     private void scrollViewToTop() {

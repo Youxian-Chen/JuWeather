@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private WeatherFragment mWeatherFragment;
     private SearchView mSearchView;
+    private CoordinatorLayout mCoordinatorLayout;
 
     private IntentFilter mWeatherIntentFilter;
     private IntentFilter mLocationIntentFilter;
@@ -144,14 +147,21 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private void startWeatherService() {
+    private void initView() {
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout_main);
+        replaceFragment(getWeatherFragment(), false);
+    }
+
+    public void startWeatherService() {
         Intent getWeatherIntent = new Intent(MainActivity.this, GetWeatherService.class);
         getWeatherIntent.setAction(GetWeatherService.GET_LOCAL_WEATHER);
         startService(getWeatherIntent);
     }
 
-    private void initView() {
-        replaceFragment(getWeatherFragment(), false);
+    public void showUpdateInfo() {
+        String updateString = "Update Successfully !!";
+        Snackbar snackbar = Snackbar.make(mCoordinatorLayout, updateString, Snackbar.LENGTH_SHORT);
+        snackbar.show();
     }
 
     private void replaceFragment(Fragment fragment, boolean addToBackStack) {
