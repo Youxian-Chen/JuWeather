@@ -19,15 +19,14 @@ import com.example.youxian.juweather.weather.CurrentWeather;
 import com.example.youxian.juweather.weather.ForecastWeather;
 
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
+
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+
 
 /**
  * Created by Youxian on 12/15/15.
@@ -169,23 +168,10 @@ public class WeatherFragment extends Fragment {
     }
 
     public void setForecastWeather(ForecastWeather forecastWeather) {
-        //mForecastWeather = forecastWeather;
         mForecastList = new ArrayList<>();
-        /*
-        ForecastWeather.List[] lists = mForecastWeather.getList();
-        for (ForecastWeather.List list: lists) {
-            if (list.getDt_txt().contains("09:00:00")) {
-                Log.d(TAG, "get date");
-                mForecastList.add(list);
-            }
-        }
-        */
         Collections.addAll(mForecastList, forecastWeather.getList());
         mForecastList.remove(0);
-        //mForecastList.remove(0);
-        //mForecastList.remove(2);
         updateForecastList();
-        refreshWeatherData();
     }
 
     private void updateForecastList() {
@@ -194,6 +180,7 @@ public class WeatherFragment extends Fragment {
         scrollViewToTop();
         isForecastWeatherUpdated = true;
         mSwipeRefreshLayout.setEnabled(true);
+        refreshWeatherData();
     }
 
     private void scrollViewToTop() {
@@ -206,19 +193,6 @@ public class WeatherFragment extends Fragment {
     }
 
     private String getWeekdayFromString(String date) {
-        /*
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        Date mDate = null;
-        try {
-            mDate = dateFormat.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Calendar c = Calendar.getInstance();
-        c.setTime(mDate);
-        return c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
-        */
-        //Log.d(TAG, date);
         long time = Long.parseLong(date) * 1000;
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(time);
@@ -269,9 +243,6 @@ public class WeatherFragment extends Fragment {
                 temp = Double.parseDouble(forecastList.getTemp().getMin()) - 273.15;
                 tag.minTemp.setText(tempFormat.format(temp) + " ℃");
             }
-            //ImageView icon = (ImageView) convertView.findViewById(R.id.icon_list_item);
-
-            //Log.d(TAG, weathers[0].getDescription());
             return convertView;
         }
     }

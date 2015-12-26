@@ -175,9 +175,6 @@ public class MainActivity extends AppCompatActivity {
     private WeatherFragment getWeatherFragment() {
         if (mWeatherFragment == null) {
             mWeatherFragment = new WeatherFragment();
-            //Bundle bundle = new Bundle();
-            //bundle.putString(LOCATION_STRING, mCityString);
-            //mWeatherFragment.setArguments(bundle);
         }
         return mWeatherFragment;
     }
@@ -191,8 +188,6 @@ public class MainActivity extends AppCompatActivity {
                 if (mWeatherFragment != null) {
                     CurrentWeather currentWeather = (CurrentWeather) intent
                             .getSerializableExtra(LOCAL_CURRENT_WEATHER);
-                    //Log.d(TAG, currentWeather.getName());
-                    //Log.d(TAG, currentWeather.getWeather(0).getMain());
                     if (currentWeather != null)
                         mWeatherFragment.setCurrentWeather(currentWeather);
                     else Log.d(TAG, "current weather null");
