@@ -58,6 +58,7 @@ public class WeatherFragment extends Fragment {
 
     private boolean isCurrentWeatherUpdated = false;
     private boolean isForecastWeatherUpdated = false;
+    private boolean isStopRefresh = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,7 @@ public class WeatherFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                isStopRefresh = false;
                 refreshWeatherData();
             }
         });
@@ -108,11 +110,14 @@ public class WeatherFragment extends Fragment {
             ((MainActivity) getActivity()).startWeatherService();
         } else if (isCurrentWeatherUpdated && isForecastWeatherUpdated) {
             Log.d(TAG, "stop refresh");
+            isStopRefresh = true;
             mSwipeRefreshLayout.setRefreshing(false);
             isCurrentWeatherUpdated = false;
             isForecastWeatherUpdated = false;
             ((MainActivity) getActivity()).showUpdateInfo();
         } else {
+            Log.d(TAG, "current updated: " + isCurrentWeatherUpdated);
+            Log.d(TAG, "forecast updated: " + isForecastWeatherUpdated);
             Log.d(TAG, "Do nothing");
         }
     }
@@ -132,6 +137,9 @@ public class WeatherFragment extends Fragment {
     }
 
     public void setCurrentWeather(CurrentWeather currentWeather) {
+        if (isStopRefresh) {
+            return;
+        }
         mCurrentWeather = currentWeather;
         updateWeather();
     }
@@ -167,6 +175,9 @@ public class WeatherFragment extends Fragment {
     }
 
     public void setForecastWeather(ForecastWeather forecastWeather) {
+        if (isStopRefresh) {
+            return;
+        }
         mForecastList = new ArrayList<>();
         Collections.addAll(mForecastList, forecastWeather.getList());
         mForecastList.remove(0);

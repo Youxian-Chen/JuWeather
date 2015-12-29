@@ -3,6 +3,7 @@ package com.example.youxian.juweather;
 import android.app.IntentService;
 import android.content.Intent;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
@@ -165,7 +166,8 @@ public class GetWeatherService extends IntentService {
 
     private void getLocation() {
         Log.d(TAG, "getLocation");
-        Location location = getLastKnownLocation();
+        //Location location = getLastKnownLocation();
+        Location location = getLocationWithCriteria();
         if (location != null) {
             Log.d(TAG, "location not null");
             Geocoder gcd = new Geocoder(this, Locale.ENGLISH);
@@ -195,6 +197,17 @@ public class GetWeatherService extends IntentService {
                 e.printStackTrace();
             }
         }
+    }
+
+    private Location getLocationWithCriteria() {
+        LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        String provider = locationManager.getBestProvider(criteria, false);
+        Log.i(TAG, "provider: " + provider);
+        Location location = locationManager.getLastKnownLocation(provider);
+        return location;
     }
 
     private Location getLastKnownLocation() {
