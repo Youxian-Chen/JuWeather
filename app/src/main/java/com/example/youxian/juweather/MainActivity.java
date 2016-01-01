@@ -24,6 +24,10 @@ import android.view.MenuItem;
 import com.example.youxian.juweather.weather.CurrentWeather;
 import com.example.youxian.juweather.weather.ForecastWeather;
 
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.toString();
     private static final String TAG_FRAGMENT = "tag_fragment";
@@ -62,11 +66,36 @@ public class MainActivity extends AppCompatActivity {
         initView();
     }
 
+    private void getLocation() {
+        LocationService locationService = new LocationService(this);
+        locationService.getLocation()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<String>() {
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        Log.d(TAG, "service location city: " + s);
+                    }
+                });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mWeatherReceiver, mWeatherIntentFilter);
         registerReceiver(mLocationReceiver, mLocationIntentFilter);
+        getLocation();
     }
 
     @Override
