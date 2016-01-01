@@ -24,8 +24,13 @@ import android.view.MenuItem;
 import com.example.youxian.juweather.weather.CurrentWeather;
 import com.example.youxian.juweather.weather.ForecastWeather;
 
+import java.util.HashMap;
+
+import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
     private IntentFilter mWeatherIntentFilter;
     private IntentFilter mLocationIntentFilter;
+
+    private CurrentWeather mCurrentWeather;
+    private ForecastWeather mForecastWeather;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,13 +74,32 @@ public class MainActivity extends AppCompatActivity {
         initView();
     }
 
-    private void getLocation() {
+    private void getLocalWeather() {
         LocationService locationService = new LocationService(this);
         locationService.getLocation()
+                .flatMap(new Func1<String, Observable<Void>>() {
+
+                    WeatherService weatherService = new WeatherService();
+                    @Override
+                    public Observable<Void> call(String s) {
+                        return Observable.zip(
+                                weatherService.getCurrentWeather(s),
+                                weatherService.getForecastWeather(s),
+
+                                new Func2<CurrentWeather, ForecastWeather, Void>() {
+                                    @Override
+                                    public Void call(CurrentWeather currentWeather, ForecastWeather forecastWeather) {
+                                        mCurrentWeather = currentWeather;
+                                        mForecastWeather = forecastWeather;
+                                        return null;
+                                    }
+                                }
+                        );
+                    }
+                })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
-
+                .subscribe(new Subscriber<Void>() {
                     @Override
                     public void onCompleted() {
 
@@ -84,8 +111,11 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onNext(String s) {
-                        Log.d(TAG, "service location city: " + s);
+                    public void onNext(Void aVoid) {
+                        if (mCurrentWeather != null && mForecastWeather != null) {
+                            Log.d(TAG, mCurrentWeather.getName());
+                            Log.d(TAG, mForecastWeather.getCity().getCountry());
+                        }
                     }
                 });
     }
@@ -95,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mWeatherReceiver, mWeatherIntentFilter);
         registerReceiver(mLocationReceiver, mLocationIntentFilter);
-        getLocation();
+        getLocalWeather();
     }
 
     @Override

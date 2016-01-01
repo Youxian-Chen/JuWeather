@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.example.youxian.juweather.weather.CurrentWeather;
 import com.example.youxian.juweather.weather.ForecastWeather;
-import com.example.youxian.juweather.weather.WeatherService;
+import com.example.youxian.juweather.weather.WeatherApi;
 
 import java.io.IOException;
 import java.util.List;
@@ -116,8 +116,8 @@ public class GetWeatherService extends IntentService {
                 .baseUrl(WEB_SERVICE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        WeatherService weatherService = mRetrofit.create(WeatherService.class);
-        mCurrentCall = weatherService.fetchCurrentWeather(city);
+        WeatherApi weatherApi = mRetrofit.create(WeatherApi.class);
+        mCurrentCall = weatherApi.fetchCurrentWeather(city);
         mCurrentCall.enqueue(mCurrentCallback);
     }
 
@@ -159,8 +159,8 @@ public class GetWeatherService extends IntentService {
                 .baseUrl(WEB_SERVICE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        WeatherService weatherService = mRetrofit.create(WeatherService.class);
-        mForecastCall = weatherService.fetchForecastWeather(city);
+        WeatherApi weatherApi = mRetrofit.create(WeatherApi.class);
+        mForecastCall = weatherApi.fetchForecastWeather(city);
         mForecastCall.enqueue(mForecastCallback);
     }
 
