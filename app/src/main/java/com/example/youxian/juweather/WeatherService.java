@@ -3,6 +3,8 @@ package com.example.youxian.juweather;
 import com.example.youxian.juweather.weather.CurrentWeather;
 import com.example.youxian.juweather.weather.ForecastWeather;
 import com.example.youxian.juweather.weather.WeatherApi;
+import com.example.youxian.juweather.weather.model.Current;
+import com.example.youxian.juweather.weather.model.Forecast;
 
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
@@ -27,11 +29,11 @@ public class WeatherService {
 
     }
 
-    public Observable<CurrentWeather> getCurrentWeather(String cityName) {
-        return mWeatherApi.fetchRCurrentWeather(cityName);
+    public Observable<Current> getCurrentWeather(String lat, String lon) {
+        return mWeatherApi.getCurrentWeather(lat, lon);
     }
 
-    public Observable<ForecastWeather> getForecastWeather(String cityName) {
-        return mWeatherApi.fetchRForecastWeather(cityName);
+    public Observable<Forecast> getForecastWeather(String cityName) {
+        return mWeatherApi.getForecastWeather(cityName);
     }
 }

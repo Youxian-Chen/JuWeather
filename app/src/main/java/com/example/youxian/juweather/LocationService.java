@@ -29,7 +29,7 @@ public class LocationService {
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
     }
 
-    public Observable<String> getLocation() {
+    public Observable<String> getLocationCity() {
         return Observable.create(new Observable.OnSubscribe<Location>() {
 
             @Override
@@ -57,6 +57,21 @@ public class LocationService {
                 String separatedString[] = addresses.get(0).getAdminArea().split(" ");
                 Log.d(TAG, "city at: " + separatedString[0]);
                 return separatedString[0];
+            }
+        });
+    }
+
+    public Observable<Location> getLocation() {
+        return Observable.create(new Observable.OnSubscribe<Location>() {
+            @Override
+            public void call(Subscriber<? super Location> subscriber) {
+                Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+                criteria.setPowerRequirement(Criteria.POWER_LOW);
+                String provider = mLocationManager.getBestProvider(criteria, false);
+                Log.i(TAG, "provider: " + provider);
+                Location location = mLocationManager.getLastKnownLocation(provider);
+                subscriber.onNext(location);
             }
         });
     }

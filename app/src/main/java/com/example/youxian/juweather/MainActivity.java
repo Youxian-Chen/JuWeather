@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.location.LocationManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -23,8 +26,14 @@ import android.view.MenuItem;
 
 import com.example.youxian.juweather.weather.CurrentWeather;
 import com.example.youxian.juweather.weather.ForecastWeather;
+import com.example.youxian.juweather.weather.model.CityWeather;
+import com.example.youxian.juweather.weather.model.Current;
+import com.example.youxian.juweather.weather.model.Forecast;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -36,6 +45,7 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.toString();
     private static final String TAG_FRAGMENT = "tag_fragment";
+    private static final int maxResults = 1;
 
     public static final String LOCAL_CURRENT_WEATHER = "local_current_weather";
     public static final String LOCAL_FORECAST_WEATHER = "local_forecast_weather";
@@ -47,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     private IntentFilter mWeatherIntentFilter;
     private IntentFilter mLocationIntentFilter;
 
+    private String mCityName;
+    private CityWeather mCityWeather;
     private CurrentWeather mCurrentWeather;
     private ForecastWeather mForecastWeather;
 
@@ -74,9 +86,137 @@ public class MainActivity extends AppCompatActivity {
         initView();
     }
 
+    private void getCurrent() {
+        LocationService locationService = new LocationService(this);
+        final WeatherService weatherService = new WeatherService();
+        locationService.getLocation()
+                .flatMap(new Func1<Location, Observable<Current>>() {
+                    @Override
+                    public Observable<Current> call(Location location) {
+                        Geocoder geocoder = new Geocoder(MainActivity.this, Locale.ENGLISH);
+                        List<Address> addresses = null;
+                        try {
+                            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), maxResults);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (addresses != null) {
+                            mCityName = addresses.get(0).getAdminArea();
+                            Log.d(TAG, "mCityName: " + mCityName);
+                        }
+                        return weatherService.getCurrentWeather(String.valueOf(location.getLatitude()),
+                                String.valueOf(location.getLongitude()));
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Current>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Current current) {
+                        for (CityWeather cityWeather : current.list) {
+                            Log.d(TAG, "city: " + cityWeather.name);
+                            if (mCityName.contains(cityWeather.name)) {
+                                mCityWeather = cityWeather;
+                                mCityName = cityWeather.name;
+                                break;
+                            }
+                        }
+
+                        weatherService.getForecastWeather(mCityName)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<Forecast>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(Forecast forecast) {
+                                Log.d(TAG, "forecast: " + forecast.city.name);
+                                Log.d(TAG, "forecast: " + forecast.list.get(0).weathers[0].description);
+                            }
+                        });
+                    }
+                });
+    }
+
     private void getLocalWeather() {
         LocationService locationService = new LocationService(this);
         locationService.getLocation()
+                .flatMap(new Func1<Location, Observable<Forecast>>() {
+                    WeatherService weatherService = new WeatherService();
+                    @Override
+                    public Observable<Forecast> call(Location location) {
+                        Geocoder geocoder = new Geocoder(MainActivity.this, Locale.ENGLISH);
+                        List<Address> addresses = null;
+                        try {
+                            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), maxResults);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (addresses != null)
+                            mCityName = addresses.get(0).getAdminArea();
+                        Log.d(TAG, "mCityName: " + mCityName);
+                        Log.d(TAG, "mLat: " + location.getLatitude());
+                        Log.d(TAG, "mLon: " + location.getLongitude());
+                        weatherService.getCurrentWeather(String.valueOf(location.getLatitude()),
+                                String.valueOf(location.getLongitude()))
+                                .map(new Func1<Current, Void>() {
+                                    @Override
+                                    public Void call(Current current) {
+                                        for (CityWeather cityWeather: current.list) {
+                                            Log.d(TAG, "current: " + cityWeather.name);
+                                            if (mCityName.contains(cityWeather.name)) {
+                                                mCityWeather = cityWeather;
+                                                mCityName = cityWeather.name;
+                                                Log.d(TAG, "city weather: " + mCityWeather.weathers[0].description);
+                                                break;
+                                            }
+                                        }
+                                        return null;
+                                    }
+                                });
+                        return weatherService.getForecastWeather(mCityName);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Forecast>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Forecast forecast) {
+                        Log.d(TAG, "forecast: " + forecast.city.name);
+                        Log.d(TAG, "forecast: " + forecast.list.get(0).weathers[0].description);
+                    }
+                });
+
+
+                /*
                 .flatMap(new Func1<String, Observable<Void>>() {
 
                     WeatherService weatherService = new WeatherService();
@@ -118,6 +258,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+                */
     }
 
     @Override
@@ -125,7 +266,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mWeatherReceiver, mWeatherIntentFilter);
         registerReceiver(mLocationReceiver, mLocationIntentFilter);
-        getLocalWeather();
+        //getLocalWeather();
+        getCurrent();
     }
 
     @Override
