@@ -17,6 +17,9 @@ import android.widget.TextView;
 
 import com.example.youxian.juweather.weather.CurrentWeather;
 import com.example.youxian.juweather.weather.ForecastWeather;
+import com.example.youxian.juweather.weather.model.CityWeather;
+import com.example.youxian.juweather.weather.model.Current;
+import com.example.youxian.juweather.weather.model.Forecast;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -191,6 +194,14 @@ public class WeatherFragment extends Fragment {
         isForecastWeatherUpdated = true;
         mSwipeRefreshLayout.setEnabled(true);
         refreshWeatherData();
+    }
+
+    public void setCityWeather(CityWeather cityWeather) {
+        Log.d(TAG, "city weather: " + cityWeather.name + " " + cityWeather.weathers[0].description);
+    }
+
+    public void setForecast(Forecast forecast) {
+        Log.d(TAG, "forecast weather: " + forecast.city.name + " " + forecast.list.get(0).weathers[0].description);
     }
 
     private void scrollViewToTop() {

@@ -267,7 +267,8 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(mWeatherReceiver, mWeatherIntentFilter);
         registerReceiver(mLocationReceiver, mLocationIntentFilter);
         //getLocalWeather();
-        getCurrent();
+        //getCurrent();
+        new WeatherManager(this).fetchWeatherData();
     }
 
     @Override
@@ -373,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    private WeatherFragment getWeatherFragment() {
+    public WeatherFragment getWeatherFragment() {
         if (mWeatherFragment == null) {
             mWeatherFragment = new WeatherFragment();
         }
