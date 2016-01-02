@@ -58,18 +58,20 @@ public class WeatherManager {
                         for (CityWeather cityWeather: current.list) {
                             if (cityName.contains(cityWeather.name)) {
                                 Log.d(TAG, "find match: " + cityWeather.name);
-                                displayCurrent(cityWeather);
+                                //displayCurrent(cityWeather);
+                                mCityWeather = cityWeather;
                                 return cityWeather.name;
                             }
                         }
                         //not find match, display one in the list
-                        displayCurrent(current.list[1]);
+                        mCityWeather = current.list[1];
                         return cityName;
                     }
                 })
                 .flatMap(new Func1<String, Observable<Forecast>>() {
                     @Override
                     public Observable<Forecast> call(String s) {
+                        Log.d(TAG, "s: " + s);
                         return mWeatherService.getForecastWeather(s);
                     }
                 })
@@ -89,6 +91,9 @@ public class WeatherManager {
                     @Override
                     public void onNext(Forecast forecast) {
                         displayForecast(forecast);
+                        displayCurrent(mCityWeather);
+                        mMainView.getWeatherFragment().setRefreshing(false);
+                        mMainView.showUpdateInfo();
                     }
                 });
 
@@ -112,10 +117,12 @@ public class WeatherManager {
     }
 
     public void displayCurrent(CityWeather cityWeather) {
+        Log.d(TAG, "displayCurrent");
         mMainView.getWeatherFragment().setCityWeather(cityWeather);
     }
 
     public void displayForecast(Forecast forecast) {
+        Log.d(TAG, "displayForecast");
         mMainView.getWeatherFragment().setForecast(forecast);
     }
 

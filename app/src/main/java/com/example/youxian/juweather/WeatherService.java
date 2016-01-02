@@ -1,7 +1,5 @@
 package com.example.youxian.juweather;
 
-import com.example.youxian.juweather.weather.CurrentWeather;
-import com.example.youxian.juweather.weather.ForecastWeather;
 import com.example.youxian.juweather.weather.WeatherApi;
 import com.example.youxian.juweather.weather.model.Current;
 import com.example.youxian.juweather.weather.model.Forecast;

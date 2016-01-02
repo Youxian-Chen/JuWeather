@@ -15,17 +15,15 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.example.youxian.juweather.weather.CurrentWeather;
-import com.example.youxian.juweather.weather.ForecastWeather;
 import com.example.youxian.juweather.weather.model.CityWeather;
-import com.example.youxian.juweather.weather.model.Current;
 import com.example.youxian.juweather.weather.model.Forecast;
+import com.example.youxian.juweather.weather.model.ForecastList;
+import com.example.youxian.juweather.weather.model.Weather;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 
 import java.util.List;
 import java.util.Locale;
@@ -54,18 +52,16 @@ public class WeatherFragment extends Fragment {
 
     //forecast weather
     private ListView mListView;
-    private List<ForecastWeather.List> mForecastList;
+    private Forecast mForecast;
+    private List<ForecastList> mForecastList;
     private ForecastWeatherAdapter mAdapter;
 
-    private CurrentWeather mCurrentWeather;
-
-    private boolean isCurrentWeatherUpdated = false;
-    private boolean isForecastWeatherUpdated = false;
-    private boolean isStopRefresh = false;
+    private WeatherManager mWeatherManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mWeatherManager = new WeatherManager((MainActivity)getActivity());
     }
 
     @Nullable
@@ -83,11 +79,10 @@ public class WeatherFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                isStopRefresh = false;
-                refreshWeatherData();
+                mWeatherManager.fetchWeatherData();
             }
         });
-        mSwipeRefreshLayout.setEnabled(false);
+
 
         //current
         mUpdateText = (TextView) view.findViewById(R.id.update_text_weather);
@@ -107,24 +102,6 @@ public class WeatherFragment extends Fragment {
 
     }
 
-    private void refreshWeatherData() {
-        if (!isCurrentWeatherUpdated && !isForecastWeatherUpdated) {
-            Log.d(TAG, "go refresh");
-            ((MainActivity) getActivity()).startWeatherService();
-        } else if (isCurrentWeatherUpdated && isForecastWeatherUpdated) {
-            Log.d(TAG, "stop refresh");
-            isStopRefresh = true;
-            mSwipeRefreshLayout.setRefreshing(false);
-            isCurrentWeatherUpdated = false;
-            isForecastWeatherUpdated = false;
-            ((MainActivity) getActivity()).showUpdateInfo();
-        } else {
-            Log.d(TAG, "current updated: " + isCurrentWeatherUpdated);
-            Log.d(TAG, "forecast updated: " + isForecastWeatherUpdated);
-            Log.d(TAG, "Do nothing");
-        }
-    }
-
     private void setWeatherIcon(ImageView icon, String description) {
         if (description.contains("clear")) {
             icon.setImageResource(R.drawable.clear);
@@ -134,74 +111,63 @@ public class WeatherFragment extends Fragment {
             icon.setImageResource(R.drawable.cloud);
         } else if (description.contains("snow")) {
             icon.setImageResource(R.drawable.snow);
-        } else if (description.contains("mist")) {
+        } else if (description.contains("mist") || description.contains("haze")) {
             icon.setImageResource(R.drawable.mist);
         }
     }
 
-    public void setCurrentWeather(CurrentWeather currentWeather) {
-        if (isStopRefresh) {
-            return;
-        }
-        mCurrentWeather = currentWeather;
-        updateWeather();
-    }
-
-    private void updateWeather() {
+    private void updateWeather(CityWeather cityWeather) {
+        Log.d(TAG, "updateWeather");
+        Log.d(TAG, "updateWeather: " + cityWeather.main.temp);
+        Log.d(TAG, "description: " + cityWeather.weathers[0].description);
         String dateFormat = "dd/MM/yyyy hh:mm:ss";
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.ENGLISH);
         Calendar calendar = Calendar.getInstance();
         mUpdateText.setText("Update At: " + formatter.format(calendar.getTime()));
         //update image
-        setWeatherIcon(mWeatherIcon, mCurrentWeather.getWeather(0).getDescription());
+        setWeatherIcon(mWeatherIcon, cityWeather.weathers[0].description);
 
-        mCityText.setText(mCurrentWeather.getName() + ", " + mCurrentWeather.getSys().getCountry());
-        mDescriptionText.setText(mCurrentWeather.getWeather(0).getDescription());
-        mHumidityText.setText("Humidity: " + mCurrentWeather.getMain().getHumidity() + " %");
-        mPressureText.setText("Pressure: " + mCurrentWeather.getMain().getPressure() + " hPa");
+        mCityText.setText(cityWeather.name + ", " + mForecast.city.country);
+        mDescriptionText.setText(cityWeather.weathers[0].description);
+        mHumidityText.setText("Humidity: " + cityWeather.main.humidity + " %");
+        mPressureText.setText("Pressure: " + cityWeather.main.pressure + " hPa");
 
         String weekdayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
         mWeekdayText.setText(weekdayName);
 
-        double temp = Double.parseDouble(mCurrentWeather.getMain().getTemp()) - 273.15;
+        double temp = Double.parseDouble(cityWeather.main.temp) - 273.15;
         DecimalFormat tempFormat = new DecimalFormat("#.0");
         mTemperatureText.setText(tempFormat.format(temp) + " ℃");
 
-        temp = Double.parseDouble(mCurrentWeather.getMain().getTemp_max()) - 273.15;
+        temp = Double.parseDouble(cityWeather.main.temp_max) - 273.15;
         mTemperatureMaxText.setText(tempFormat.format(temp) + " ℃");
 
-        temp = Double.parseDouble(mCurrentWeather.getMain().getTemp_min()) - 273.15;
+        temp = Double.parseDouble(cityWeather.main.temp_min) - 273.15;
         mTemperatureMinText.setText(tempFormat.format(temp) + " ℃");
-        scrollViewToTop();
-        isCurrentWeatherUpdated = true;
-        refreshWeatherData();
-    }
-
-    public void setForecastWeather(ForecastWeather forecastWeather) {
-        if (isStopRefresh) {
-            return;
-        }
-        mForecastList = new ArrayList<>();
-        Collections.addAll(mForecastList, forecastWeather.getList());
-        mForecastList.remove(0);
-        updateForecastList();
     }
 
     private void updateForecastList() {
         mAdapter = new ForecastWeatherAdapter();
         mListView.setAdapter(mAdapter);
         scrollViewToTop();
-        isForecastWeatherUpdated = true;
-        mSwipeRefreshLayout.setEnabled(true);
-        refreshWeatherData();
     }
 
     public void setCityWeather(CityWeather cityWeather) {
-        Log.d(TAG, "city weather: " + cityWeather.name + " " + cityWeather.weathers[0].description);
+        Log.d(TAG, "setCityWeather");
+        updateWeather(cityWeather);
     }
 
     public void setForecast(Forecast forecast) {
-        Log.d(TAG, "forecast weather: " + forecast.city.name + " " + forecast.list.get(0).weathers[0].description);
+        Log.d(TAG, "setForecast");
+        mForecast = forecast;
+        mForecastList = new ArrayList<>();
+        mForecastList.addAll(forecast.list);
+        mForecastList.remove(0);
+        updateForecastList();
+    }
+
+    public void setRefreshing(boolean refreshing) {
+        mSwipeRefreshLayout.setRefreshing(refreshing);
     }
 
     private void scrollViewToTop() {
@@ -239,7 +205,7 @@ public class WeatherFragment extends Fragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ForecastWeather.List forecastList = mForecastList.get(position);
+            ForecastList forecastList = mForecastList.get(position);
             if (convertView == null) {
                 convertView = View.inflate(parent.getContext(), R.layout.weather_list_item, null);
                 ViewHolder tag = new ViewHolder();
@@ -252,16 +218,16 @@ public class WeatherFragment extends Fragment {
             }
 
             ViewHolder tag = (ViewHolder) convertView.getTag();
-            ForecastWeather.Weather[] weathers = forecastList.getWeather();
+            Weather[] weathers = forecastList.weathers;
 
             if (forecastList != null) {
-                tag.weekday.setText(getWeekdayFromString(forecastList.getTimeStamp()));
-                setWeatherIcon(tag.icon, weathers[0].getDescription());
-                tag.description.setText(weathers[0].getDescription());
-                double temp = Double.parseDouble(forecastList.getTemp().getMax()) - 273.15;
+                tag.weekday.setText(getWeekdayFromString(forecastList.timestamp));
+                setWeatherIcon(tag.icon, weathers[0].description);
+                tag.description.setText(weathers[0].description);
+                double temp = Double.parseDouble(forecastList.temp.max) - 273.15;
                 DecimalFormat tempFormat = new DecimalFormat("#.0");
                 tag.maxTemp.setText(tempFormat.format(temp) + " ℃");
-                temp = Double.parseDouble(forecastList.getTemp().getMin()) - 273.15;
+                temp = Double.parseDouble(forecastList.temp.min) - 273.15;
                 tag.minTemp.setText(tempFormat.format(temp) + " ℃");
             }
             return convertView;
