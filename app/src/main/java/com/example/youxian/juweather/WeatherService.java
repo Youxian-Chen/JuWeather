@@ -1,8 +1,8 @@
 package com.example.youxian.juweather;
 
-import com.example.youxian.juweather.weather.WeatherApi;
-import com.example.youxian.juweather.weather.model.Current;
-import com.example.youxian.juweather.weather.model.Forecast;
+import com.example.youxian.juweather.model.CurrentByCity;
+import com.example.youxian.juweather.model.Current;
+import com.example.youxian.juweather.model.Forecast;
 
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
@@ -33,5 +33,9 @@ public class WeatherService {
 
     public Observable<Forecast> getForecastWeather(String cityName) {
         return mWeatherApi.getForecastWeather(cityName);
+    }
+
+    public Observable<CurrentByCity> getCurrentWeatherByCity(String cityName) {
+        return mWeatherApi.getCurrentWeatherByCity(cityName);
     }
 }

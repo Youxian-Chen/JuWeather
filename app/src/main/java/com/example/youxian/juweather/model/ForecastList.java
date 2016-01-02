@@ -1,18 +1,14 @@
-package com.example.youxian.juweather.weather.model;
+package com.example.youxian.juweather.model;
 
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Youxian on 1/1/16.
  */
-public class CityWeather {
-    public int id;
-    public String name;
-    public Main main;
+public class ForecastList {
     @SerializedName("dt")
     public String timestamp;
-    @SerializedName("sys")
-    public System system;
+    public Temp temp;
     @SerializedName("weather")
     public Weather[] weathers;
 }

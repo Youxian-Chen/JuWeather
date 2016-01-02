@@ -1,4 +1,4 @@
-package com.example.youxian.juweather.weather.model;
+package com.example.youxian.juweather.model;
 
 import java.util.List;
 

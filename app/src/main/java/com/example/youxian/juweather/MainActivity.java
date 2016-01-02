@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import rx.Observable;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.toString();
     private static final String TAG_FRAGMENT = "tag_fragment";
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
         } else {
-            mWeatherManager.fetchWeatherData();
+            mWeatherManager.fetchLocalWeatherData();
         }
         registerReceiver(mLocationReceiver, mLocationIntentFilter);
     }
@@ -111,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void searchWeather(String city) {
-
+        mWeatherManager.fetchSearchWeatherData(Observable.just(city));
     }
 
     private void buildAlertMessageNoGps() {
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                 if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     Log.d(TAG, "GPS enabled");
-                    mWeatherManager.fetchWeatherData();
+                    mWeatherManager.fetchLocalWeatherData();
                 }
             }
         }

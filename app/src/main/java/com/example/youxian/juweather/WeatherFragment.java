@@ -15,10 +15,11 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.example.youxian.juweather.weather.model.CityWeather;
-import com.example.youxian.juweather.weather.model.Forecast;
-import com.example.youxian.juweather.weather.model.ForecastList;
-import com.example.youxian.juweather.weather.model.Weather;
+import com.example.youxian.juweather.model.CityWeather;
+import com.example.youxian.juweather.model.CurrentByCity;
+import com.example.youxian.juweather.model.Forecast;
+import com.example.youxian.juweather.model.ForecastList;
+import com.example.youxian.juweather.model.Weather;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -79,7 +80,7 @@ public class WeatherFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mWeatherManager.fetchWeatherData();
+                mWeatherManager.fetchLocalWeatherData();
             }
         });
 
@@ -144,11 +145,43 @@ public class WeatherFragment extends Fragment {
 
         temp = Double.parseDouble(cityWeather.main.temp_min) - 273.15;
         mTemperatureMinText.setText(tempFormat.format(temp) + " ℃");
+        scrollViewToTop();
     }
 
     private void updateForecastList() {
         mAdapter = new ForecastWeatherAdapter();
         mListView.setAdapter(mAdapter);
+        scrollViewToTop();
+    }
+
+    private void updateWeatherByCity(CurrentByCity currentByCity) {
+        Log.d(TAG, "updateWeatherByCity");
+        Log.d(TAG, "updateWeatherByCity: " + currentByCity.main.temp);
+        Log.d(TAG, "description: " + currentByCity.weathers[0].description);
+        String dateFormat = "dd/MM/yyyy hh:mm:ss";
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.ENGLISH);
+        Calendar calendar = Calendar.getInstance();
+        mUpdateText.setText("Update At: " + formatter.format(calendar.getTime()));
+        //update image
+        setWeatherIcon(mWeatherIcon, currentByCity.weathers[0].description);
+
+        mCityText.setText(currentByCity.name + ", " + currentByCity.system.country);
+        mDescriptionText.setText(currentByCity.weathers[0].description);
+        mHumidityText.setText("Humidity: " + currentByCity.main.humidity + " %");
+        mPressureText.setText("Pressure: " + currentByCity.main.pressure + " hPa");
+
+        String weekdayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
+        mWeekdayText.setText(weekdayName);
+
+        double temp = Double.parseDouble(currentByCity.main.temp) - 273.15;
+        DecimalFormat tempFormat = new DecimalFormat("#.0");
+        mTemperatureText.setText(tempFormat.format(temp) + " ℃");
+
+        temp = Double.parseDouble(currentByCity.main.temp_max) - 273.15;
+        mTemperatureMaxText.setText(tempFormat.format(temp) + " ℃");
+
+        temp = Double.parseDouble(currentByCity.main.temp_min) - 273.15;
+        mTemperatureMinText.setText(tempFormat.format(temp) + " ℃");
         scrollViewToTop();
     }
 
@@ -164,6 +197,11 @@ public class WeatherFragment extends Fragment {
         mForecastList.addAll(forecast.list);
         mForecastList.remove(0);
         updateForecastList();
+    }
+
+    public void setCurrentByCity(CurrentByCity currentByCity) {
+        Log.d(TAG, "setCurrentByCity");
+        updateWeatherByCity(currentByCity);
     }
 
     public void setRefreshing(boolean refreshing) {

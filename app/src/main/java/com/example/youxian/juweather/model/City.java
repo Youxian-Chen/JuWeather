@@ -1,4 +1,4 @@
-package com.example.youxian.juweather.weather.model;
+package com.example.youxian.juweather.model;
 
 /**
  * Created by Youxian on 1/1/16.
