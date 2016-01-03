@@ -1,12 +1,23 @@
 package com.example.youxian.juweather.widget;
 
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.RemoteViews;
+
+import com.example.youxian.juweather.R;
+import com.example.youxian.juweather.WeatherManager;
+import com.example.youxian.juweather.model.CityWeather;
+
+import java.text.DecimalFormat;
+
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 
 /**
@@ -14,20 +25,77 @@ import android.util.Log;
  */
 public class WeatherWidgetProvider extends AppWidgetProvider {
 
-
     @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+    public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.d("TAG", "onUpdate");
         ComponentName thisWidget = new ComponentName(context,
                 WeatherWidgetProvider.class);
-        int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
-        Intent intent = new Intent(context.getApplicationContext(),
-                UpdateWidgetService.class);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+        final int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+        WidgetManager widgetManager = new WidgetManager(context);
+        widgetManager.fetchWeatherDataForWidget()
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Subscriber<CityWeather>() {
+                    @Override
+                    public void onCompleted() {
 
-        // Update the widgets via the service
-        context.startService(intent);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(CityWeather cityWeather) {
+                        updateWeatherData(context, appWidgetManager, allWidgetIds, cityWeather);
+                    }
+                });
+
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+    }
+
+    private void updateWeatherData(Context context, AppWidgetManager appWidgetManager,
+                                   int[] allWidgetIds, CityWeather cityWeather) {
+
+        for (int id: allWidgetIds) {
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+                    R.layout.widget_weather);
+
+            remoteViews.setTextViewText(R.id.location_text_widget, cityWeather.name);
+
+            String description = cityWeather.weathers[0].description;
+            if (description.contains("clear")) {
+                remoteViews.setImageViewResource(R.id.icon_image_widget, R.drawable.clear);
+            } else if (description.contains("rain")) {
+                remoteViews.setImageViewResource(R.id.icon_image_widget, R.drawable.rain);
+            } else if (description.contains("cloud")) {
+                remoteViews.setImageViewResource(R.id.icon_image_widget, R.drawable.cloud);
+            } else if (description.contains("snow")) {
+                remoteViews.setImageViewResource(R.id.icon_image_widget, R.drawable.snow);
+            } else if (description.contains("mist") || description.contains("haze")) {
+                remoteViews.setImageViewResource(R.id.icon_image_widget, R.drawable.mist);
+            }
+
+            double temp = Double.parseDouble(cityWeather.main.temp) - 273.15;
+            DecimalFormat tempFormat = new DecimalFormat("#.0");
+            remoteViews.setTextViewText(R.id.temperature_text_widget, tempFormat.format(temp) + " ℃");
+
+            remoteViews.setTextViewText(R.id.description_text_widget, description);
+
+
+            // Register an onClickListener
+            Intent clickIntent = new Intent(context, WeatherWidgetProvider.class);
+
+            clickIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
+                    allWidgetIds);
+
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setOnClickPendingIntent(R.id.layout_widget, pendingIntent);
+            appWidgetManager.updateAppWidget(id, remoteViews);
+
+        }
     }
 
 }
