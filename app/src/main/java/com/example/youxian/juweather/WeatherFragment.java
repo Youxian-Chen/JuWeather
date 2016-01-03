@@ -76,7 +76,7 @@ public class WeatherFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mScrollView = (ScrollView) view.findViewById(R.id.scrollview_weather);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_weather);
-        mSwipeRefreshLayout.setColorSchemeColors(R.color.blue50, R.color.orange50, R.color.redA2);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.orange50);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
