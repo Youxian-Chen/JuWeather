@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 
 /**
@@ -16,7 +17,7 @@ public class WeatherWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        super.onUpdate(context, appWidgetManager, appWidgetIds);
+        Log.d("TAG", "onUpdate");
         ComponentName thisWidget = new ComponentName(context,
                 WeatherWidgetProvider.class);
         int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
@@ -26,7 +27,7 @@ public class WeatherWidgetProvider extends AppWidgetProvider {
 
         // Update the widgets via the service
         context.startService(intent);
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
-
 
 }

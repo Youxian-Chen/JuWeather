@@ -8,9 +8,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 
 import com.example.youxian.juweather.LocationService;
 import com.example.youxian.juweather.R;
@@ -38,7 +36,6 @@ public class UpdateWidgetService extends IntentService {
      */
     private static final String TAG = UpdateWidgetService.class.toString();
     private static final int maxResults = 1;
-
     private LocationService mLocationService;
     private WeatherService mWeatherService;
     private Location mLocation;
@@ -150,9 +147,10 @@ public class UpdateWidgetService extends IntentService {
 
             remoteViews.setTextViewText(R.id.description_text_widget, description);
 
+
             // Register an onClickListener
             Intent clickIntent = new Intent(this.getApplicationContext(),
-                    UpdateWidgetService.class);
+                    WeatherWidgetProvider.class);
 
             clickIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
@@ -162,6 +160,7 @@ public class UpdateWidgetService extends IntentService {
                     PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setOnClickPendingIntent(R.id.layout_widget, pendingIntent);
             appWidgetManager.updateAppWidget(id, remoteViews);
+
         }
         stopSelf();
     }
