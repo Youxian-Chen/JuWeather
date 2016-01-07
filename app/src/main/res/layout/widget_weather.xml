@@ -4,9 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/layout_widget"
-    android:orientation="horizontal"
-    android:alpha="0.87"
-    android:background="@color/cyanA2">
+    android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,6 +18,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/icon_image_widget"
             android:src="@drawable/cloud"
+            android:alpha="0.75"
             android:scaleType="fitCenter"/>
 
         <TextView
