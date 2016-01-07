@@ -55,9 +55,8 @@ public class MainActivity extends AppCompatActivity {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
-        } else {
-            mWeatherManager.fetchLocalWeatherData();
         }
+        mWeatherManager.fetchLocalWeatherData();
         registerReceiver(mLocationReceiver, mLocationIntentFilter);
     }
 
@@ -140,9 +139,8 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(getWeatherFragment(), false);
     }
 
-    public void showUpdateInfo() {
-        String updateString = "Update Weather Data Successfully !!";
-        Snackbar snackbar = Snackbar.make(mCoordinatorLayout, updateString, Snackbar.LENGTH_SHORT);
+    public void showUpdateInfo(String info) {
+        Snackbar snackbar = Snackbar.make(mCoordinatorLayout, info, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 

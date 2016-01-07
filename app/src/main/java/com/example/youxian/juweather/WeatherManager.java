@@ -29,7 +29,8 @@ import rx.schedulers.Schedulers;
 public class WeatherManager {
     private static final String TAG = WeatherManager.class.toString();
     private static final int maxResults = 1;
-
+    private static final String UPDATED_SUCCESS = "Update Weather Data Successfully !!";
+    private static final String UPDATED_FAILED = "Can't fetch Weather Data, Check your GPS or network !!";
     private MainActivity mMainView;
     private LocationService mLocationService;
     private WeatherService mWeatherService;
@@ -80,7 +81,7 @@ public class WeatherManager {
                 displayCurrentByCity((CurrentByCity) weatherBases.get(0));
                 displayForecast((Forecast) weatherBases.get(1));
                 mMainView.getWeatherFragment().setRefreshing(false);
-                mMainView.showUpdateInfo();
+                mMainView.showUpdateInfo(UPDATED_SUCCESS);
             }
         });
     }
@@ -129,7 +130,8 @@ public class WeatherManager {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        mMainView.getWeatherFragment().setRefreshing(false);
+                        mMainView.showUpdateInfo(UPDATED_FAILED);
                     }
 
                     @Override
@@ -137,7 +139,7 @@ public class WeatherManager {
                         displayForecast(forecast);
                         displayCurrent(mCityWeather);
                         mMainView.getWeatherFragment().setRefreshing(false);
-                        mMainView.showUpdateInfo();
+                        mMainView.showUpdateInfo(UPDATED_SUCCESS);
                     }
                 });
 

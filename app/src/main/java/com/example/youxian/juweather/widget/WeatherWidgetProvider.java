@@ -10,9 +10,11 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.example.youxian.juweather.MainActivity;
 import com.example.youxian.juweather.R;
 import com.example.youxian.juweather.WeatherManager;
 import com.example.youxian.juweather.model.CityWeather;
+import com.example.youxian.juweather.model.Temp;
 
 import java.text.DecimalFormat;
 
@@ -84,6 +86,7 @@ public class WeatherWidgetProvider extends AppWidgetProvider {
 
 
             // Register an onClickListener
+            /*
             Intent clickIntent = new Intent(context, WeatherWidgetProvider.class);
 
             clickIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
@@ -93,6 +96,11 @@ public class WeatherWidgetProvider extends AppWidgetProvider {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setOnClickPendingIntent(R.id.layout_widget, pendingIntent);
+            */
+            Intent configIntent = new Intent(context, MainActivity.class);
+            PendingIntent configPendingIntent = PendingIntent.getActivity(context, 0, configIntent, 0);
+            remoteViews.setOnClickPendingIntent(R.id.layout_widget, configPendingIntent);
+
             appWidgetManager.updateAppWidget(id, remoteViews);
 
         }

@@ -1,51 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/layout_widget">
+    android:layout_height="match_parent"
+    android:id="@+id/layout_widget"
+    android:orientation="horizontal"
+    android:alpha="0.87"
+    android:background="@color/cyanA2">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerVertical="true">
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:gravity="center">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/icon_image_widget"
             android:src="@drawable/cloud"
-            android:scaleType="fitCenter"
-            android:layout_centerVertical="true"/>
+            android:scaleType="fitCenter"/>
 
         <TextView
             style="@style/WidgetTextStyle"
             android:id="@+id/description_text_widget"
-            android:layout_centerVertical="true"
-            android:layout_below="@+id/icon_image_widget"
+            android:layout_width="70dp"
+            android:gravity="center"
             android:textSize="16sp"
-            android:layout_marginStart="30dp"/>
+            android:text="rain"/>
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
 
         <TextView
             style="@style/WidgetTextStyle"
             android:id="@+id/location_text_widget"
-            android:layout_centerInParent="true"
-            android:layout_toEndOf="@+id/description_text_widget"
-            android:layout_marginStart="20dp"
             android:textSize="36sp"
-            android:layout_centerHorizontal="true" />
+            android:layout_marginTop="30dp"
+            android:text="taipei"/>
 
         <TextView
             style="@style/WidgetTextStyle"
             android:id="@+id/temperature_text_widget"
-            android:layout_below="@+id/location_text_widget"
-            android:layout_toEndOf="@+id/description_text_widget"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
             android:textSize="40sp"
-            android:layout_centerHorizontal="true" />
+            android:layout_marginTop="20dp"
+            android:text="25C"/>
+
+    </LinearLayout>
 
 
-    </RelativeLayout>
 
-</RelativeLayout>
+</LinearLayout>
