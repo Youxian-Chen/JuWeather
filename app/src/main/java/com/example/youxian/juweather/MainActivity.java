@@ -55,8 +55,9 @@ public class MainActivity extends AppCompatActivity {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
+        } else {
+            mWeatherManager.fetchLocalWeatherData();
         }
-        mWeatherManager.fetchLocalWeatherData();
         registerReceiver(mLocationReceiver, mLocationIntentFilter);
     }
 
@@ -160,15 +161,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private BroadcastReceiver mLocationReceiver = new BroadcastReceiver() {
+        boolean isGpsOn = false;
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             Log.d(TAG, action);
             if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(action)) {
                 LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !isGpsOn) {
                     Log.d(TAG, "GPS enabled");
                     mWeatherManager.fetchLocalWeatherData();
+                    isGpsOn = true;
                 }
             }
         }

@@ -42,7 +42,7 @@ public class LocationService {
                 criteria.setPowerRequirement(Criteria.POWER_LOW);
                 String provider = mLocationManager.getBestProvider(criteria, false);
                 Log.i(TAG, "provider: " + provider);
-                Location location = getLastLocation(provider);
+                Location location = getLastLocation(provider, 1000);
                 //Location location = mLocationManager.getLastKnownLocation(provider);
                 Log.d(TAG, "location: " + location.getLatitude());
                 subscriber.onNext(location);
@@ -50,7 +50,7 @@ public class LocationService {
         });
     }
 
-    private Location getLastLocation(String provider) {
+    private Location getLastLocation(String provider, int interval) {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(LAST_LOCATION, Context.MODE_PRIVATE);
         Location location = mLocationManager.getLastKnownLocation(provider);
         if (location == null) {
@@ -58,11 +58,12 @@ public class LocationService {
             if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 Log.d(TAG, "gps on");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(interval);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                return  getLastLocation(provider);
+                interval = interval + interval;
+                return  getLastLocation(provider, interval);
             } else {
                 String lat = sharedPreferences.getString(LAST_LOCATION_LAT, null);
                 String lon = sharedPreferences.getString(LAST_LOCATION_LON, null);
