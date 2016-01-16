@@ -1,10 +1,13 @@
 package com.example.youxian.juweather;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 
+import com.example.youxian.juweather.Constant.Constant;
 import com.example.youxian.juweather.model.CityWeather;
 import com.example.youxian.juweather.model.Current;
 import com.example.youxian.juweather.model.CurrentByCity;
@@ -37,6 +40,8 @@ public class WeatherManager {
 
     private CityWeather mCityWeather;
     private Location mLocation;
+    private String mCityName;
+    private CityWeather[] mWeatherList;
 
     private List<WeatherBase> mSearchWeatherData;
 
@@ -100,16 +105,20 @@ public class WeatherManager {
                     @Override
                     public String call(Current current) {
                         String cityName = getCityFromLocation(mLocation);
-                        for (CityWeather cityWeather: current.list) {
-                            if (cityName.contains(cityWeather.name)) {
-                                Log.d(TAG, "find match: " + cityWeather.name);
-                                //displayCurrent(cityWeather);
-                                mCityWeather = cityWeather;
-                                return cityWeather.name;
+                        if (cityName == null) {
+                            mWeatherList = current.list;
+                        } else {
+                            for (CityWeather cityWeather: current.list) {
+                                if (cityName.contains(cityWeather.name)) {
+                                    Log.d(TAG, "find match: " + cityWeather.name);
+                                    mCityWeather = cityWeather;
+                                    mCityName = cityWeather.name;
+                                    return mCityName;
+                                }
                             }
+                            //not find match, display one in the list
+                            mCityWeather = current.list[1];
                         }
-                        //not find match, display one in the list
-                        mCityWeather = current.list[1];
                         return cityName;
                     }
                 })
@@ -117,6 +126,7 @@ public class WeatherManager {
                     @Override
                     public Observable<Forecast> call(String s) {
                         Log.d(TAG, "s: " + s);
+                        mCityName = s;
                         return mWeatherService.getForecastWeather(s);
                     }
                 })
@@ -125,41 +135,62 @@ public class WeatherManager {
                 .subscribe(new Subscriber<Forecast>() {
                     @Override
                     public void onCompleted() {
-
+                        Log.d(TAG, "onCompleted");
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        mMainView.getWeatherFragment().setRefreshing(false);
-                        mMainView.showUpdateInfo(UPDATED_FAILED);
+                        Log.d(TAG, "onError: " + e.getMessage());
+                        if (mCityName != null) {
+                            mMainView.getWeatherFragment().setRefreshing(false);
+                            mMainView.showUpdateInfo(UPDATED_FAILED);
+                        } else {
+                            displayCityFragment(mWeatherList);
+                        }
                     }
 
                     @Override
                     public void onNext(Forecast forecast) {
+                        Log.d(TAG, "onNext");
                         displayForecast(forecast);
                         displayCurrent(mCityWeather);
                         mMainView.getWeatherFragment().setRefreshing(false);
                         mMainView.showUpdateInfo(UPDATED_SUCCESS);
+                        displayWeatherFragment();
                     }
                 });
 
     }
 
     private String getCityFromLocation(Location location) {
+        Log.d(TAG, "getCityFromLocation");
         Geocoder geocoder = new Geocoder(mMainView, Locale.ENGLISH);
         List<Address> addresses = null;
+        /*
         try {
             addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), maxResults);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        */
         if (addresses != null) {
             if (addresses.get(0) != null) {
                 return addresses.get(0).getAdminArea();
             }
         }
-        return null;
+        return getStoredCityName();
+    }
+
+    private void displayCityFragment(CityWeather[] cityWeathers) {
+        mMainView.showCityList(cityWeathers);
+        mMainView.hideLoadingBar();
+        mMainView.hideWeatherFragment();
+    }
+
+    private void displayWeatherFragment() {
+        mMainView.showWeatherFragment();
+        mMainView.hideLoadingBar();
+        mMainView.hideCityList();
     }
 
     public void displayCurrent(CityWeather cityWeather) {
@@ -174,6 +205,18 @@ public class WeatherManager {
 
     public void displayCurrentByCity(CurrentByCity currentByCity) {
         mMainView.getWeatherFragment().setCurrentByCity(currentByCity);
+    }
+
+    public void storeCityName(String name) {
+        Log.d(TAG, name);
+        SharedPreferences sharedPreferences = mMainView.getSharedPreferences(Constant.LAST_LOCATION, Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString(Constant.LAST_LOCATION_CITY, name).apply();
+        fetchLocalWeatherData();
+    }
+
+    private String getStoredCityName() {
+        SharedPreferences sharedPreferences = mMainView.getSharedPreferences(Constant.LAST_LOCATION, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(Constant.LAST_LOCATION_CITY, null);
     }
 
 

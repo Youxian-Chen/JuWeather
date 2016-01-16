@@ -124,27 +124,33 @@ public class WeatherFragment extends Fragment {
         String dateFormat = "dd/MM/yyyy hh:mm:ss";
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.ENGLISH);
         Calendar calendar = Calendar.getInstance();
-        mUpdateText.setText("Update At: " + formatter.format(calendar.getTime()));
+        String stateString = "Update At: " + formatter.format(calendar.getTime());
+        mUpdateText.setText(stateString);
         //update image
         setWeatherIcon(mWeatherIcon, cityWeather.weathers[0].description);
-
-        mCityText.setText(cityWeather.name + ", " + mForecast.city.country);
+        stateString = cityWeather.name + ", " + mForecast.city.country;
+        mCityText.setText(stateString);
         mDescriptionText.setText(cityWeather.weathers[0].description);
-        mHumidityText.setText("Humidity: " + cityWeather.main.humidity + " %");
-        mPressureText.setText("Pressure: " + cityWeather.main.pressure + " hPa");
+        stateString = "Humidity: " + cityWeather.main.humidity + " %";
+        mHumidityText.setText(stateString);
+        stateString = "Pressure: " + cityWeather.main.pressure + " hPa";
+        mPressureText.setText(stateString);
 
         String weekdayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
         mWeekdayText.setText(weekdayName);
 
         double temp = Double.parseDouble(cityWeather.main.temp) - 273.15;
         DecimalFormat tempFormat = new DecimalFormat("#.0");
-        mTemperatureText.setText(tempFormat.format(temp) + " ℃");
+        stateString = tempFormat.format(temp) + " ℃";
+        mTemperatureText.setText(stateString);
 
         temp = Double.parseDouble(cityWeather.main.temp_max) - 273.15;
-        mTemperatureMaxText.setText(tempFormat.format(temp) + " ℃");
+        stateString = tempFormat.format(temp) + " ℃";
+        mTemperatureMaxText.setText(stateString);
 
         temp = Double.parseDouble(cityWeather.main.temp_min) - 273.15;
-        mTemperatureMinText.setText(tempFormat.format(temp) + " ℃");
+        stateString = tempFormat.format(temp) + " ℃";
+        mTemperatureMinText.setText(stateString);
         scrollViewToTop();
     }
 
@@ -161,27 +167,33 @@ public class WeatherFragment extends Fragment {
         String dateFormat = "dd/MM/yyyy hh:mm:ss";
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.ENGLISH);
         Calendar calendar = Calendar.getInstance();
-        mUpdateText.setText("Update At: " + formatter.format(calendar.getTime()));
+        String stateString = "Update At: " + formatter.format(calendar.getTime());
+        mUpdateText.setText(stateString);
         //update image
         setWeatherIcon(mWeatherIcon, currentByCity.weathers[0].description);
-
-        mCityText.setText(currentByCity.name + ", " + currentByCity.system.country);
+        stateString = currentByCity.name + ", " + currentByCity.system.country;
+        mCityText.setText(stateString);
         mDescriptionText.setText(currentByCity.weathers[0].description);
-        mHumidityText.setText("Humidity: " + currentByCity.main.humidity + " %");
-        mPressureText.setText("Pressure: " + currentByCity.main.pressure + " hPa");
+        stateString = "Humidity: " + currentByCity.main.humidity + " %";
+        mHumidityText.setText(stateString);
+        stateString = "Pressure: " + currentByCity.main.pressure + " hPa";
+        mPressureText.setText(stateString);
 
         String weekdayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
         mWeekdayText.setText(weekdayName);
 
         double temp = Double.parseDouble(currentByCity.main.temp) - 273.15;
         DecimalFormat tempFormat = new DecimalFormat("#.0");
-        mTemperatureText.setText(tempFormat.format(temp) + " ℃");
+        stateString = tempFormat.format(temp) + " ℃";
+        mTemperatureText.setText(stateString);
 
         temp = Double.parseDouble(currentByCity.main.temp_max) - 273.15;
-        mTemperatureMaxText.setText(tempFormat.format(temp) + " ℃");
+        stateString = tempFormat.format(temp) + " ℃";
+        mTemperatureMaxText.setText(stateString);
 
         temp = Double.parseDouble(currentByCity.main.temp_min) - 273.15;
-        mTemperatureMinText.setText(tempFormat.format(temp) + " ℃");
+        stateString = tempFormat.format(temp) + " ℃";
+        mTemperatureMinText.setText(stateString);
         scrollViewToTop();
     }
 

@@ -1,0 +1,54 @@
+<android.support.v7.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="4dp"
+    android:layout_margin="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/cloud"
+            android:id="@+id/city_item_icon"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="broken cloud"
+            android:id="@+id/city_item_description"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="5dp"
+            android:layout_below="@+id/city_item_icon"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Taipei"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:id="@+id/city_item_name"
+            android:layout_marginStart="15dp"
+            android:layout_toEndOf="@+id/city_item_icon"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/city_item_temp"
+            android:text="18"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"
+            android:layout_centerVertical="true"/>
+
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

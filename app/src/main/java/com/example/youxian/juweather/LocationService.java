@@ -10,6 +10,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
 
+import com.example.youxian.juweather.Constant.Constant;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -23,9 +25,6 @@ import rx.functions.Func1;
  */
 public class LocationService {
     private static final String TAG = LocationService.class.toString();
-    private static final String LAST_LOCATION = "last_location";
-    private static final String LAST_LOCATION_LAT = "last_location_lat";
-    private static final String LAST_LOCATION_LON = "last_location_lon";
     private LocationManager mLocationManager;
     private Context mContext;
     public LocationService(Context context) {
@@ -51,7 +50,7 @@ public class LocationService {
     }
 
     private Location getLastLocation(String provider, int interval) {
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(LAST_LOCATION, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(Constant.LAST_LOCATION, Context.MODE_PRIVATE);
         Location location = mLocationManager.getLastKnownLocation(provider);
         if (location == null) {
             Log.d(TAG, "location null");
@@ -65,8 +64,8 @@ public class LocationService {
                 interval = interval + interval;
                 return  getLastLocation(provider, interval);
             } else {
-                String lat = sharedPreferences.getString(LAST_LOCATION_LAT, null);
-                String lon = sharedPreferences.getString(LAST_LOCATION_LON, null);
+                String lat = sharedPreferences.getString(Constant.LAST_LOCATION_LAT, null);
+                String lon = sharedPreferences.getString(Constant.LAST_LOCATION_LON, null);
                 Log.d(TAG, "lat: " + lat + " @ lon: " + lon);
                 if (lat != null && lon != null) {
                     Location lastLocation = new Location(LocationManager.GPS_PROVIDER);
@@ -77,8 +76,8 @@ public class LocationService {
             }
         } else {
             Log.d(TAG, "lat: " + location.getLatitude() + " @ lon: " + location.getLongitude());
-            sharedPreferences.edit().putString(LAST_LOCATION_LAT, String.valueOf(location.getLatitude())).apply();
-            sharedPreferences.edit().putString(LAST_LOCATION_LON, String.valueOf(location.getLongitude())).apply();
+            sharedPreferences.edit().putString(Constant.LAST_LOCATION_LAT, String.valueOf(location.getLatitude())).apply();
+            sharedPreferences.edit().putString(Constant.LAST_LOCATION_LON, String.valueOf(location.getLongitude())).apply();
             return location;
         }
         return null;
