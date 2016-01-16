@@ -74,9 +74,8 @@ public class MainActivity extends AppCompatActivity {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
-        } else {
-            mWeatherManager.fetchLocalWeatherData();
         }
+        mWeatherManager.checkLocationState();
         registerReceiver(mLocationReceiver, mLocationIntentFilter);
     }
 
@@ -192,12 +191,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showCityList(CityWeather[] cityWeathers) {
-        Log.d(TAG, "showCityList");
         mRecyclerView.setVisibility(View.VISIBLE);
-        Log.d(TAG, cityWeathers.length + "size");
         mCityList.clear();
         Collections.addAll(mCityList, cityWeathers);
         mCityAdapter.notifyDataSetChanged();
+        String info = "Select the city you live in, Please !!";
+        Snackbar snackbar = Snackbar.make(mCoordinatorLayout, info, Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
     }
 
     public void hideCityList() {
@@ -210,10 +210,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void hideWeatherFragment() {
         mRelativeLayout.setVisibility(View.GONE);
-    }
-
-    public void showLoadingBar() {
-        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     public void hideLoadingBar() {

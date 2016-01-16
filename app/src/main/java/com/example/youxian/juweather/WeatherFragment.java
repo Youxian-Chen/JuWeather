@@ -55,7 +55,6 @@ public class WeatherFragment extends Fragment {
     private ListView mListView;
     private Forecast mForecast;
     private List<ForecastList> mForecastList;
-    private ForecastWeatherAdapter mAdapter;
 
     private WeatherManager mWeatherManager;
 
@@ -155,7 +154,7 @@ public class WeatherFragment extends Fragment {
     }
 
     private void updateForecastList() {
-        mAdapter = new ForecastWeatherAdapter();
+        ForecastWeatherAdapter mAdapter = new ForecastWeatherAdapter();
         mListView.setAdapter(mAdapter);
         scrollViewToTop();
     }
@@ -276,9 +275,11 @@ public class WeatherFragment extends Fragment {
                 tag.description.setText(weathers[0].description);
                 double temp = Double.parseDouble(forecastList.temp.max) - 273.15;
                 DecimalFormat tempFormat = new DecimalFormat("#.0");
-                tag.maxTemp.setText(tempFormat.format(temp) + " ℃");
+                String stateString = tempFormat.format(temp) + " ℃";
+                tag.maxTemp.setText(stateString);
                 temp = Double.parseDouble(forecastList.temp.min) - 273.15;
-                tag.minTemp.setText(tempFormat.format(temp) + " ℃");
+                stateString = tempFormat.format(temp) + " ℃";
+                tag.minTemp.setText(stateString);
             }
             return convertView;
         }

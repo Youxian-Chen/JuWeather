@@ -166,19 +166,24 @@ public class WeatherManager {
         Log.d(TAG, "getCityFromLocation");
         Geocoder geocoder = new Geocoder(mMainView, Locale.ENGLISH);
         List<Address> addresses = null;
-        /*
         try {
             addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), maxResults);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        */
         if (addresses != null) {
             if (addresses.get(0) != null) {
                 return addresses.get(0).getAdminArea();
             }
         }
         return getStoredCityName();
+    }
+
+    public void checkLocationState() {
+        SharedPreferences sharedPreferences = mMainView.getSharedPreferences(Constant.LAST_LOCATION, Context.MODE_PRIVATE);
+        if (sharedPreferences.getString(Constant.LAST_LOCATION_LAT, null) != null) {
+            fetchLocalWeatherData();
+        }
     }
 
     private void displayCityFragment(CityWeather[] cityWeathers) {

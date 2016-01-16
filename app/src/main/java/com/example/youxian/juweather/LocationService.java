@@ -43,7 +43,6 @@ public class LocationService {
                 Log.i(TAG, "provider: " + provider);
                 Location location = getLastLocation(provider, 1000);
                 //Location location = mLocationManager.getLastKnownLocation(provider);
-                Log.d(TAG, "location: " + location.getLatitude());
                 subscriber.onNext(location);
             }
         });
@@ -76,6 +75,14 @@ public class LocationService {
             }
         } else {
             Log.d(TAG, "lat: " + location.getLatitude() + " @ lon: " + location.getLongitude());
+            String originLat = sharedPreferences.getString(Constant.LAST_LOCATION_LAT, null);
+            String originLon = sharedPreferences.getString(Constant.LAST_LOCATION_LON, null);
+            String newLat = String.valueOf(location.getLatitude());
+            String newLon = String.valueOf(location.getLongitude());
+            if (!newLat.equals(originLat) || !newLon.equals(originLon)) {
+                Log.d(TAG, "new location");
+                sharedPreferences.edit().putString(Constant.LAST_LOCATION_CITY, null).apply();
+            }
             sharedPreferences.edit().putString(Constant.LAST_LOCATION_LAT, String.valueOf(location.getLatitude())).apply();
             sharedPreferences.edit().putString(Constant.LAST_LOCATION_LON, String.valueOf(location.getLongitude())).apply();
             return location;
