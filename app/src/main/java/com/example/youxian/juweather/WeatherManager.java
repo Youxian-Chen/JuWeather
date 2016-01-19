@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.util.Log;
 
 import com.example.youxian.juweather.Constant.Constant;
@@ -166,6 +167,7 @@ public class WeatherManager {
         Log.d(TAG, "getCityFromLocation");
         Geocoder geocoder = new Geocoder(mMainView, Locale.ENGLISH);
         List<Address> addresses = null;
+        /*
         try {
             addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), maxResults);
         } catch (IOException e) {
@@ -176,12 +178,15 @@ public class WeatherManager {
                 return addresses.get(0).getAdminArea();
             }
         }
+        */
         return getStoredCityName();
     }
 
     public void checkLocationState() {
         SharedPreferences sharedPreferences = mMainView.getSharedPreferences(Constant.LAST_LOCATION, Context.MODE_PRIVATE);
-        if (sharedPreferences.getString(Constant.LAST_LOCATION_LAT, null) != null) {
+        LocationManager locationManager = (LocationManager) mMainView.getSystemService(Context.LOCATION_SERVICE);
+        if (sharedPreferences.getString(Constant.LAST_LOCATION_LAT, null) != null
+                || locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             fetchLocalWeatherData();
         }
     }

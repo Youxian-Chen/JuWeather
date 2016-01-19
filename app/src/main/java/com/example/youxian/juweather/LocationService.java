@@ -41,7 +41,7 @@ public class LocationService {
                 criteria.setPowerRequirement(Criteria.POWER_LOW);
                 String provider = mLocationManager.getBestProvider(criteria, false);
                 Log.i(TAG, "provider: " + provider);
-                Location location = getLastLocation(provider, 1000);
+                Location location = getLastLocation(provider, 100);
                 //Location location = mLocationManager.getLastKnownLocation(provider);
                 subscriber.onNext(location);
             }
