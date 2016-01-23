@@ -146,7 +146,8 @@ public class WeatherManager {
                             mMainView.getWeatherFragment().setRefreshing(false);
                             mMainView.showUpdateInfo(UPDATED_FAILED);
                         } else {
-                            displayCityFragment(mWeatherList);
+                            if (mWeatherList != null)
+                                displayCityFragment(mWeatherList);
                         }
                     }
 

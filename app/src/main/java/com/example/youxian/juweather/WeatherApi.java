@@ -13,12 +13,12 @@ import rx.Observable;
  */
 public interface WeatherApi {
 
-    @GET("/data/2.5/find?appid=2de143494c0b295cca9337e1e96b00e0&cnt=8")
+    @GET("/data/2.5/find?appid=727aa6438ef7127bfc8650be4d1ecb2d&cnt=8")
     Observable<Current> getCurrentWeather(@Query("lat") String lat, @Query("lon") String lon);
 
-    @GET("/data/2.5/forecast/daily?appid=2de143494c0b295cca9337e1e96b00e0&mode=json&cnt=8")
+    @GET("/data/2.5/forecast/daily?appid=727aa6438ef7127bfc8650be4d1ecb2d&mode=json&cnt=8")
     Observable<Forecast> getForecastWeather(@Query("q") String city);
 
-    @GET("/data/2.5/weather?appid=2de143494c0b295cca9337e1e96b00e0")
+    @GET("/data/2.5/weather?appid=727aa6438ef7127bfc8650be4d1ecb2d")
     Observable<CurrentByCity> getCurrentWeatherByCity(@Query("q") String city);
 }
