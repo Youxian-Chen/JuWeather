@@ -1,4 +1,4 @@
-package com.example.youxian.juweather;
+package com.example.youxian.juweather.weather;
 
 
 import android.os.Bundle;
@@ -15,14 +15,15 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.youxian.juweather.MainActivity;
+import com.example.youxian.juweather.R;
+import com.example.youxian.juweather.Utils;
 import com.example.youxian.juweather.model.CityWeather;
 import com.example.youxian.juweather.model.CurrentByCity;
 import com.example.youxian.juweather.model.Forecast;
 import com.example.youxian.juweather.model.ForecastList;
 import com.example.youxian.juweather.model.Weather;
 
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -120,36 +121,22 @@ public class WeatherFragment extends Fragment {
         Log.d(TAG, "updateWeather");
         Log.d(TAG, "updateWeather: " + cityWeather.main.temp);
         Log.d(TAG, "description: " + cityWeather.weathers[0].description);
-        String dateFormat = "dd/MM/yyyy hh:mm:ss";
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.ENGLISH);
-        Calendar calendar = Calendar.getInstance();
-        String stateString = "Update At: " + formatter.format(calendar.getTime());
-        mUpdateText.setText(stateString);
+
+        mUpdateText.setText(Utils.currentFormattedTime());
         //update image
         setWeatherIcon(mWeatherIcon, cityWeather.weathers[0].description);
-        stateString = cityWeather.name + ", " + mForecast.city.country;
+        String stateString = cityWeather.name + ", " + mForecast.city.country;
         mCityText.setText(stateString);
         mDescriptionText.setText(cityWeather.weathers[0].description);
         stateString = "Humidity: " + cityWeather.main.humidity + " %";
         mHumidityText.setText(stateString);
         stateString = "Pressure: " + cityWeather.main.pressure + " hPa";
         mPressureText.setText(stateString);
+        mWeekdayText.setText(Utils.weekDay());
 
-        String weekdayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
-        mWeekdayText.setText(weekdayName);
-
-        double temp = Double.parseDouble(cityWeather.main.temp) - 273.15;
-        DecimalFormat tempFormat = new DecimalFormat("#.0");
-        stateString = tempFormat.format(temp) + " ℃";
-        mTemperatureText.setText(stateString);
-
-        temp = Double.parseDouble(cityWeather.main.temp_max) - 273.15;
-        stateString = tempFormat.format(temp) + " ℃";
-        mTemperatureMaxText.setText(stateString);
-
-        temp = Double.parseDouble(cityWeather.main.temp_min) - 273.15;
-        stateString = tempFormat.format(temp) + " ℃";
-        mTemperatureMinText.setText(stateString);
+        mTemperatureText.setText(Utils.temperatureFormat(cityWeather.main.temp));
+        mTemperatureMaxText.setText(Utils.temperatureFormat(cityWeather.main.temp_max));
+        mTemperatureMinText.setText(Utils.temperatureFormat(cityWeather.main.temp_min));
         scrollViewToTop();
     }
 
@@ -163,36 +150,24 @@ public class WeatherFragment extends Fragment {
         Log.d(TAG, "updateWeatherByCity");
         Log.d(TAG, "updateWeatherByCity: " + currentByCity.main.temp);
         Log.d(TAG, "description: " + currentByCity.weathers[0].description);
-        String dateFormat = "dd/MM/yyyy hh:mm:ss";
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.ENGLISH);
-        Calendar calendar = Calendar.getInstance();
-        String stateString = "Update At: " + formatter.format(calendar.getTime());
-        mUpdateText.setText(stateString);
+
+        mUpdateText.setText(Utils.currentFormattedTime());
         //update image
         setWeatherIcon(mWeatherIcon, currentByCity.weathers[0].description);
-        stateString = currentByCity.name + ", " + currentByCity.system.country;
+        String stateString = currentByCity.name + ", " + currentByCity.system.country;
         mCityText.setText(stateString);
         mDescriptionText.setText(currentByCity.weathers[0].description);
         stateString = "Humidity: " + currentByCity.main.humidity + " %";
         mHumidityText.setText(stateString);
         stateString = "Pressure: " + currentByCity.main.pressure + " hPa";
         mPressureText.setText(stateString);
+        mWeekdayText.setText(Utils.weekDay());
 
-        String weekdayName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
-        mWeekdayText.setText(weekdayName);
+        mTemperatureText.setText(Utils.temperatureFormat(currentByCity.main.temp));
 
-        double temp = Double.parseDouble(currentByCity.main.temp) - 273.15;
-        DecimalFormat tempFormat = new DecimalFormat("#.0");
-        stateString = tempFormat.format(temp) + " ℃";
-        mTemperatureText.setText(stateString);
+        mTemperatureMaxText.setText(Utils.temperatureFormat(currentByCity.main.temp_max));
 
-        temp = Double.parseDouble(currentByCity.main.temp_max) - 273.15;
-        stateString = tempFormat.format(temp) + " ℃";
-        mTemperatureMaxText.setText(stateString);
-
-        temp = Double.parseDouble(currentByCity.main.temp_min) - 273.15;
-        stateString = tempFormat.format(temp) + " ℃";
-        mTemperatureMinText.setText(stateString);
+        mTemperatureMinText.setText(Utils.temperatureFormat(currentByCity.main.temp_min));
         scrollViewToTop();
     }
 
@@ -273,13 +248,8 @@ public class WeatherFragment extends Fragment {
                 tag.weekday.setText(getWeekdayFromString(forecastList.timestamp));
                 setWeatherIcon(tag.icon, weathers[0].description);
                 tag.description.setText(weathers[0].description);
-                double temp = Double.parseDouble(forecastList.temp.max) - 273.15;
-                DecimalFormat tempFormat = new DecimalFormat("#.0");
-                String stateString = tempFormat.format(temp) + " ℃";
-                tag.maxTemp.setText(stateString);
-                temp = Double.parseDouble(forecastList.temp.min) - 273.15;
-                stateString = tempFormat.format(temp) + " ℃";
-                tag.minTemp.setText(stateString);
+                tag.maxTemp.setText(Utils.temperatureFormat(forecastList.temp.max));
+                tag.minTemp.setText(Utils.temperatureFormat(forecastList.temp.min));
             }
             return convertView;
         }

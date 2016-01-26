@@ -1,4 +1,4 @@
-package com.example.youxian.juweather;
+package com.example.youxian.juweather.weather;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,13 +9,14 @@ import android.location.LocationManager;
 import android.util.Log;
 
 import com.example.youxian.juweather.Constant.Constant;
+import com.example.youxian.juweather.LocationService;
+import com.example.youxian.juweather.MainActivity;
 import com.example.youxian.juweather.model.CityWeather;
 import com.example.youxian.juweather.model.Current;
 import com.example.youxian.juweather.model.CurrentByCity;
 import com.example.youxian.juweather.model.Forecast;
 import com.example.youxian.juweather.model.WeatherBase;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

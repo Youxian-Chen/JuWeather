@@ -30,6 +30,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.youxian.juweather.model.CityWeather;
+import com.example.youxian.juweather.weather.WeatherFragment;
+import com.example.youxian.juweather.weather.WeatherManager;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

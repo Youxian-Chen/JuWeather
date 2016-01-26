@@ -7,7 +7,7 @@ import android.location.Location;
 import android.util.Log;
 
 import com.example.youxian.juweather.LocationService;
-import com.example.youxian.juweather.WeatherService;
+import com.example.youxian.juweather.weather.WeatherService;
 import com.example.youxian.juweather.model.CityWeather;
 import com.example.youxian.juweather.model.Current;
 

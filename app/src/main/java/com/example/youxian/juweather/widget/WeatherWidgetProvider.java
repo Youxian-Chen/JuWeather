@@ -12,11 +12,10 @@ import android.widget.RemoteViews;
 
 import com.example.youxian.juweather.MainActivity;
 import com.example.youxian.juweather.R;
-import com.example.youxian.juweather.WeatherManager;
+import com.example.youxian.juweather.Utils;
 import com.example.youxian.juweather.model.CityWeather;
-import com.example.youxian.juweather.model.Temp;
 
-import java.text.DecimalFormat;
+
 
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
@@ -78,10 +77,7 @@ public class WeatherWidgetProvider extends AppWidgetProvider {
                 remoteViews.setImageViewResource(R.id.icon_image_widget, R.drawable.mist);
             }
 
-            double temp = Double.parseDouble(cityWeather.main.temp) - 273.15;
-            DecimalFormat tempFormat = new DecimalFormat("#.0");
-            remoteViews.setTextViewText(R.id.temperature_text_widget, tempFormat.format(temp) + " ℃");
-
+            remoteViews.setTextViewText(R.id.temperature_text_widget, Utils.temperatureFormat(cityWeather.main.temp));
             remoteViews.setTextViewText(R.id.description_text_widget, description);
 
 

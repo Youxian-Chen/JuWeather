@@ -2,23 +2,15 @@ package com.example.youxian.juweather;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Address;
 import android.location.Criteria;
-import android.location.Geocoder;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
 
 import com.example.youxian.juweather.Constant.Constant;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 /**
  * Created by Youxian on 1/1/16.
@@ -77,11 +69,11 @@ public class LocationService {
             Log.d(TAG, "lat: " + location.getLatitude() + " @ lon: " + location.getLongitude());
             String originLat = sharedPreferences.getString(Constant.LAST_LOCATION_LAT, null);
             String originLon = sharedPreferences.getString(Constant.LAST_LOCATION_LON, null);
-            String newLat = String.valueOf(location.getLatitude());
-            String newLon = String.valueOf(location.getLongitude());
-            if (!newLat.equals(originLat) || !newLon.equals(originLon)) {
-                Log.d(TAG, "new location");
-                sharedPreferences.edit().putString(Constant.LAST_LOCATION_CITY, null).apply();
+            if (originLat != null && originLon != null) {
+                if (Utils.isLocationChanged(location, originLat, originLon)) {
+                    Log.d(TAG, "new location");
+                    sharedPreferences.edit().putString(Constant.LAST_LOCATION_CITY, null).apply();
+                }
             }
             sharedPreferences.edit().putString(Constant.LAST_LOCATION_LAT, String.valueOf(location.getLatitude())).apply();
             sharedPreferences.edit().putString(Constant.LAST_LOCATION_LON, String.valueOf(location.getLongitude())).apply();

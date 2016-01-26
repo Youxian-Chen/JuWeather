@@ -1,4 +1,4 @@
-package com.example.youxian.juweather;
+package com.example.youxian.juweather.weather;
 
 import com.example.youxian.juweather.model.CurrentByCity;
 import com.example.youxian.juweather.model.Current;
