@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.example.youxian.juweather.Constant.Constant;
@@ -19,12 +21,35 @@ public class LocationService {
     private static final String TAG = LocationService.class.toString();
     private LocationManager mLocationManager;
     private Context mContext;
+
+    private LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            Log.d(TAG, "onLocationChanged");
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            Log.d(TAG, "onProviderEnabled: " + provider);
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            Log.d(TAG, "onProviderDisabled: + " + provider);
+        }
+    };
     public LocationService(Context context) {
         mContext = context;
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
     }
 
     public Observable<Location> getLocation() {
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,mLocationListener);
         return Observable.create(new Observable.OnSubscribe<Location>() {
             @Override
             public void call(Subscriber<? super Location> subscriber) {
@@ -66,6 +91,7 @@ public class LocationService {
                 }
             }
         } else {
+            mLocationManager.removeUpdates(mLocationListener);
             Log.d(TAG, "lat: " + location.getLatitude() + " @ lon: " + location.getLongitude());
             String originLat = sharedPreferences.getString(Constant.LAST_LOCATION_LAT, null);
             String originLon = sharedPreferences.getString(Constant.LAST_LOCATION_LON, null);
